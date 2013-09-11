@@ -1,0 +1,168 @@
+//--------------------------------------------------------------------------
+
+@import 'compass/css3';
+
+//--------------------------------------------------------------------------
+
+$navbar-height:  36px;
+$navbar-padding: 5px;
+$navbar-bg:      #555;
+
+$accent-color: #09c;
+
+/***************************************************************************
+	navbar:
+***************************************************************************/
+
+.devhook-navbar {
+	position:      fixed;
+	z-index:       2000;
+	background:    $navbar-bg;
+	border-bottom: 1px solid darken($navbar-bg, 20%);
+	height:        $navbar-height;
+	width:         100%;
+	top:           0;
+
+	@include background(linear-gradient(top, $navbar-bg, darken($navbar-bg, 10%)));
+	@include box-shadow(0 0 10px rgba(0,0,0,.2), 0 0 0 1px rgba(255,255,255,.1), 0 0 4px rgba(0,0,0,.3) inset);
+
+	> * {
+		font: 13px/20px Arial;
+	}
+
+	ul, li {
+		margin:     0;
+		padding:    0;
+		list-style: none;
+	}
+	> ul {
+		float:       left;
+		// padding:     0 $navbar-padding;
+		border-left: 5px solid rgba(0,0,0,.3);
+
+		// @include box-shadow(0 0 3px rgba(#FFF, .2) inset);
+
+		&:first-child {
+			border-left: none;
+		}
+
+		&.dh-tray {
+			float:right;
+		}
+
+		> li {
+			display: block;
+			float: left;
+
+
+			> *:first-child {
+				color:       #AAA;
+				// background:  rgba(0,0,0,.15);
+				// border:      1px solid mix($navbar-bg, #FFF, 90%);
+				display:     block;
+				padding:     0 15px;
+				height:      $navbar-height;
+				line-height: $navbar-height;
+
+				// @include background(darken($navbar-bg, 15%));
+				// @include box-shadow(0 1px 2px rgba(0,0,0,.2) inset, 0 1px 0 rgba(255,255,255,.1));
+				// @include border-radius(4px);
+			}
+
+			&.active > *:first-child {
+				color: #EEE;
+				// background-color: lighten($navbar-bg, 30%);
+				// background-image: linear-gradient(top, rgba(#FFF, .5), rgba(#FFF, 0));
+				// text-shadow: 0 0 5px rgba(255,255,255,.7);
+				//
+				text-shadow:      0 1px 1px rgba(#000,.3);
+				border-bottom:    3px solid $accent-color;
+				background-color: rgba(#000, .2);
+				background-image: linear-gradient(bottom, rgba($accent-color, .25), rgba($accent-color, 0) 50%);
+			}
+			&:hover > *:first-child,
+			> *:first-child:hover {
+				background:      rgba(#000, .1);
+				color:           #FFF;
+				text-decoration: none;
+				border-bottom:   3px solid #FFF;
+			}
+
+			// LEVEL 2
+			> ul {
+				display:    none;
+				position:   absolute;
+				min-width:  150px;
+				overflow:   hidden;
+				// margin:     1px 0 0 0;
+
+				// padding-bottom: 5px;
+				// background:     $accent-color;
+
+				@include border-radius(0 0 5px 5px);
+				@include box-shadow(0 3px 21px rgba(0,0,0,.5), 0 0 0 1px rgba(#000,.1));
+
+
+				> li {
+					display: block;
+
+					> a {
+						font-size:     14px;
+						color:         #333;
+						background:    #FFF;
+						display:       block;
+						padding:       7px 15px;
+						margin-bottom: -1px;
+
+						// @include box-shadow(0 -1px 0 rgba(0,0,0,.3) inset);
+
+						&:hover {
+							text-decoration: none;
+							color:           #333;
+							background-image: linear-gradient(top, #EEE, #DDD);
+						}
+					}
+
+					&.active > a {
+						border-left: 3px solid $accent-color;
+						color:       #666;
+					}
+				}
+			}
+		}
+	}
+	> ul.dh-modes {
+		margin:   $navbar-padding;
+		overflow: hidden;
+		boreder:  none;
+
+		@include border-radius(3px);
+		@include box-shadow(none);
+
+		> li > a {
+			padding:     0 10px;
+			height:      $navbar-height - $navbar-padding * 2;
+			line-height: $navbar-height - $navbar-padding * 2;
+			background:  rgba(0,0,0,.3);
+			@include box-shadow(0 1px 1px rgba(#000, .3) inset);
+		}
+		> li.active > a {
+			background: $accent-color;
+			@include box-shadow(none);
+		}
+
+		// $accent-color: #A00;
+		// border-bottom:    3px solid $accent-color;
+		// background-image: linear-gradient(bottom, rgba($accent-color, .3), rgba($accent-color, .1) 30%, rgba($accent-color, 0));
+	}
+}
+
+.dropdown {
+	position: relative;
+
+	&:hover ul {
+		display: block;
+	}
+}
+
+//--------------------------------------------------------------------------

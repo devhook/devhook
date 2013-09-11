@@ -1,0 +1,26 @@
+{
+	"name": "devhook/devhook",
+	"description": "",
+	"authors": [
+		{
+			"name": "zb3k",
+			"email": "d.bourim@gmail.com"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0",
+		"illuminate/support": "4.0.x"
+	},
+	"autoload": {
+		"classmap": [
+			"src/components"
+		],
+		"files": [
+			"src/Devhook/helpers.php"
+		],
+		"psr-0": {
+			"Devhook": "src/"
+		}
+	},
+	"minimum-stability": "dev"
+}

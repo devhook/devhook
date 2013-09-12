@@ -19,7 +19,7 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 	protected $modelFullKeyword; // name.space.model
 	protected $modelClass;       // Name\Space\Model
 
-	protected static $imageFields = array();
+	// protected static $imageFields = array();
 
 
 	// protected $adminController = true;
@@ -110,22 +110,22 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 
 	//--------------------------------------------------------------------------
 
-	public function image($size = null, $attr = array())
-	{
-		$force = false;
+	// public function image($size = null, $attr = array())
+	// {
+	// 	$force = false;
 
-		if ($this->image && isset(static::$imageFields['image'])) {
-			if (!$size) {
-				$size = static::$imageFields['image']['default_size'];
-			}
+	// 	if ($this->image && isset(static::$imageFields['image'])) {
+	// 		if (!$size) {
+	// 			$size = static::$imageFields['image']['default_size'];
+	// 		}
 
-			$src = ImageField::imageUrl($this, 'image', $size, $force);
+	// 		$src = ImageField::imageUrl($this, 'image', $size, $force);
 
-			return app('html')->image($src, null, $attr);
-		}
+	// 		return app('html')->image($src, null, $attr);
+	// 	}
 
-		return '';
-	}
+	// 	return '';
+	// }
 
 	//--------------------------------------------------------------------------
 
@@ -383,13 +383,7 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 			$rules = $rulesKey;
 		} else {
 			foreach ($fields as $name => $field) {
-				$fieldRules = $field && ! empty($field[$rulesKey]) ? $field[$rulesKey] : false;
-				$type       = $field && ! empty($field['field']) ? $field['field'] : '';
-
-				if ($fieldClass = \Devhook::fieldClass($type)) {
-					$fieldRules = $fieldClass::setRules($this, $name, $fieldRules);
-				}
-				if ($fieldRules) {
+				if ($field && ($fieldRules = $field->rules($rulesKey))) {
 					$rules[$fieldPrefix . $name] = $fieldRules;
 				}
 			}
@@ -397,8 +391,8 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 
 		// Field names
 		foreach ($fields as $name => $field) {
-			if (!empty($field['label'])) {
-				$names[$fieldPrefix . $name] = $field['label'];
+			if (!empty($field->label)) {
+				$names[$fieldPrefix . $name] = $field->label;
 			}
 		}
 
@@ -439,22 +433,17 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 			$data = Input::all();
 		}
 
-		$updateMode = $this->exists;
-		$insertMode = ! $this->exists;
-		$fields     = $this->fields();
+		$fields = $this->fields();
 
 		foreach ($fields as $name => $field) {
-
-			if (isset($field['db']) && !$field['db']) {
+			if ($field && $field->db === false) {
 				continue;
 			}
 
-			if (!empty($field['field']) && ($fieldClass = \Devhook::fieldClass($field['field']))) {
-				$fieldClass::setValue($this, $name, $data);
+			if ($field) {
+				$field->setValue($data);
 			} elseif (isset($data[$name])) {
 				$this->$name = $data[$name];
-			} elseif ($insertMode && isset($field['default'])) {
-				$this->$name = $field['default'];
 			}
 		}
 	}

@@ -189,7 +189,7 @@ class AdminUI
 				// 	$mutator = $fields[$key]->valueMutator($model, $key);
 				// }
 				$data['columns'][$key] = $fields[$key];
-				// $data['columns'][$key]->mutator = $mutator;
+				$data['columns'][$key]->mutator = $mutator ? $mutator : false;
 			}
 		}
 

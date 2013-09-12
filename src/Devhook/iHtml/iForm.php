@@ -499,7 +499,7 @@ class iForm {
 
 	public function fieldRequired($field)
 	{
-		return $this->fields[$field]->required;
+		return $this->fields[$field]->required($this->rulesKey);
 	}
 
 	//--------------------------------------------------------------------------
@@ -524,7 +524,7 @@ class iForm {
 
 	public function fieldType($field, $value = null)
 	{
-		return $this->fieldProperty($field, 'type', $value);
+		return  $this->fieldProperty($field, 'type', $value);
 	}
 
 	//--------------------------------------------------------------------------

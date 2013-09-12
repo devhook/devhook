@@ -6,6 +6,7 @@ class BaseField {
 
 	//--------------------------------------------------------------------------
 
+	public $db;
 	public $name;
 	public $type;
 	public $label;
@@ -21,16 +22,64 @@ class BaseField {
 
 	//--------------------------------------------------------------------------
 
+	protected function init(){}
+
+	//--------------------------------------------------------------------------
+
 	public function __construct($name, $field, $model)
 	{
-		$this->label   = isset($field['label']) ? $field['label'] : '';
-		$this->type    = is_array($field['field']) ? $field['field']['type'] : $field['field'];
-		$this->name    = $name;
-		$this->model   = $model;
-		$this->options = isset($field['options']) ? $field['options'] : array();
-
-
 		$this->original = $field;
+
+		$this->settings = is_array($field['field']) ? $field['field'] : array();
+		$this->type     = $this->settings ? $this->settings['type'] : $field['field'];
+		$this->label    = $this->get('label');
+		$this->options  = $this->get('options');
+		$this->db       = $this->get('db');
+		$this->name     = $name;
+
+		$this->model   = $model;
+
+		$this->init();
+	}
+
+	//--------------------------------------------------------------------------
+
+	public function get($key)
+	{
+		return isset($this->original[$key]) ? $this->original[$key] : null;
+	}
+
+	//--------------------------------------------------------------------------
+
+	public function rules($key)
+	{
+		return $this->setRules($this->get($key));
+	}
+
+	//--------------------------------------------------------------------------
+
+	public function required($rulesKey = 'rules')
+	{
+		if ($rules = $this->get($rulesKey)) {
+			if (is_array($rules)) {
+				return current($rules) == 'required';
+			}
+
+			return strpos($rules, 'required') !== false;
+		}
+
+		return false;
+	}
+
+	//--------------------------------------------------------------------------
+
+	public function settings($key = null, $default = null)
+	{
+		if($key) {
+			return isset($this->settings[$key]) ? $this->settings[$key] : value($default);
+		}
+
+		return $this->settings;
 	}
 
 	//--------------------------------------------------------------------------
@@ -47,9 +96,28 @@ class BaseField {
 				return Form::select($this->name, $this->options, $value, $attr);
 
 			default:
-				// if (is_callable(array('Form', $type))) {
+				// if (method_exists('Form', $type)) {
 					return Form::$type($this->name, $value, $attr);
 				// }
+		}
+	}
+
+	//--------------------------------------------------------------------------
+
+	protected function setRules($rules)
+	{
+		return $rules;
+	}
+
+	//--------------------------------------------------------------------------
+
+	public function setValue($data)
+	{
+		$name  = $this->name;
+		$model = $this->model;
+
+		if (isset($data[$name])) {
+			$model->$name = $data[$name];
 		}
 	}
 

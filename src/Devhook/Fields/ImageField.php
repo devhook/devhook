@@ -7,6 +7,7 @@ use \Config;
 use \View;
 use \File;
 use \Form;
+use \HTML;
 
 class ImageField extends FileField {
 
@@ -29,92 +30,90 @@ class ImageField extends FileField {
 
 	//--------------------------------------------------------------------------
 
-	public static function makeField($form, $field, $value, $attr)
+	protected function init()
 	{
-		$mode = static::fieldSettings('mode', self::DEFAULT_MODE);
+		if (empty($this->settings['mimes'])) {
+			$this->settings['mimes'] = 'jpeg,bmp,png,gif';
+		}
+	}
 
-		$model = $form->model;
+	//--------------------------------------------------------------------------
 
-		switch ($mode)
+	public function render($value, $attr)
+	{
+		$model = $this->model;
+
+		switch ($this->settings('mode'))
 		{
-			case self::DEFAULT_MODE:
+			case self::SIMPLE_MODE:
+				return Form::file($this->name, $attr);
+
+			case self::MULTIPLE_MODE:
+				$view   = View::make('fields/image_multiple');
+				$method = $this->name . 's';
+				$images = $model->$method;
+
+				$view->with('images', $images);
+				$view->with('columns', $this->settings('columns', 5));
+				break;
+
+			default:
 				$view = View::make('fields/image');
 				$view->with('image', $value);
 				if ($value) {
 					$exists = file_exists(public_path($value));
 					$view->with('filename',     pathinfo($value, PATHINFO_BASENAME));
 					$view->with('filesize',     $exists ? File::size(public_path($value)) : 0);
-					$view->with('removeAction', \Admin::url('action/delete', $model->modelFullKeyword(), $model->id, $field));
+					$view->with('removeAction', \Admin::url('action/delete', $model->modelFullKeyword(), $model->id, $this->name));
 				}
 				break;
-
-			case self::MULTIPLE_MODE:
-				$view   = View::make('fields/image_multiple');
-				$method = $field . 's';
-				$images = $model->$method;
-
-				$view->with('images', $images);
-				$view->with('columns', static::fieldSettings('columns', 5));
-				break;
-
-			default:
-				return Form::file($field, $attr);
 		}
 
 		$sizeKey = false;
-		if ($sizes = static::fieldSettings('sizes')) {
+		if ($sizes = $this->settings('sizes')) {
 			$keys    = array_keys($sizes);
 			$sizeKey = current($keys);
 		}
 
-		$view->with('settings', static::fieldSettings());
-		$view->with('mode',     $mode);
-		$view->with('form',     $form);
-		$view->with('field',    $field);
-		$view->with('model',    $model);
-		$view->with('attr',     $attr);
-		$view->with('sizeKey',  $sizeKey);
+		$view->with('field',   $this->name);
+		$view->with('attr',    $attr);
+		$view->with('sizeKey', $sizeKey);
 
 		return $view;
 	}
 
 	//--------------------------------------------------------------------------
 
-	public static function setValue($model, $field, $data)
+	public function setValue($data)
 	{
-		parent::init($model, $field);
-
-		$mode = static::fieldSettings('mode', self::DEFAULT_MODE);
+		$mode = $this->settings('mode', self::DEFAULT_MODE);
+		$name = $this->name;
 
 		if ($mode == self::DEFAULT_MODE) {
-			return parent::setValue($model, $field, $data);
+			return parent::setValue($data);
 		}
 
-		if (empty($data[$field])) {
+		if (empty($data[$name])) {
 			return;
 		}
 
 
-		if ($newfile = static::saveFile($model, $field, $data[$field])) {
-			if ( ! $model->$field) {
-				$model->$field = $newfile;
+		if ($newfile = $this->saveFile($data[$name])) {
+			if ( ! $model->$name) {
+				$model->$name = $newfile;
 			}
 
-			$model->event('saved', function($model) use($field, $newfile) {
-				\ImageField::afterSave($model, $field, $newfile);
-			});
+			$model->event('saved', array($this, 'afterSave'));
 		}
 	}
 
 	//--------------------------------------------------------------------------
 
-	public static function afterSave($model, $field, $filepath = null)
+	public function afterSave()
 	{
-		static::init($model, $field);
-
-		if ( ! $filepath) {
-			$filepath = $model->$field;
-		}
+		$name     = $this->name;
+		$model    = $this->model;
+		$filepath = $model->$name;
 
 		if ( ! $filepath) {
 			return;
@@ -130,11 +129,11 @@ class ImageField extends FileField {
 		$image->imageable_id   = $model->getKey();
 		$image->imageable_type = $model->modelKeyword();
 		$image->path           = $filepath;
-		$image->primary        = $filepath == $model->getAttribute($field);
+		$image->primary        = $filepath == $model->getAttribute($name);
 		$image->forceSave();
 
 
-		if ($moveFile = static::fieldSettings('moveFile')) {
+		if ($moveFile = $this->settings('moveFile')) {
 			$fileObj = new \Symfony\Component\HttpFoundation\File\File($absFile, false);
 			$newFile = $moveFile($model, $fileObj, $image);
 
@@ -155,7 +154,7 @@ class ImageField extends FileField {
 					File::delete(public_path($filepath));
 				}
 
-				$model->$field = $newFile;
+				$model->$name = $newFile;
 				$model->forceSave();
 
 				$image->path = $newFile;
@@ -166,38 +165,9 @@ class ImageField extends FileField {
 
 	//--------------------------------------------------------------------------
 
-	public static function imageUrl($model, $field, $sizeKey, $force)
+	public function adminValueMutator($row = null, $field = null)
 	{
-		if ($model->$field) {
-			return asset(self::$imageRoute . '/' . ($force ? 'force/' : '') . $model->modelKeyword() . '/' . $model->getKey() . '/' . $field . '-' . $sizeKey . '.jpg');
-		}
-	}
-
-	//--------------------------------------------------------------------------
-
-	public static function makeImage($model, $field, $sizeKey, $force)
-	{
-		if ($src = static::imageUrl($model, $field, $sizeKey, $force)) {
-			return "<img src='{$src}' alt='' />";
-		}
-	}
-
-	//--------------------------------------------------------------------------
-
-	public function adminValueMutator($model = null, $field = null)
-	{
-		$fields = $model->fields();
-
-		// if (empty($fields[$field]->field)) {
-		// 	return null;
-		// }
-		return '{IMG}';
-		// $fieldOpt = $fields[$field]['field'];
-		// return function($row) use ($model, $field, $fieldOpt) {
-		// 	$sizeKey = current(array_keys($fieldOpt['sizes']));
-		// 	$src = static::imageUrl($row, $field, $sizeKey, false);
-		// 	return "<img src='{$src}' style='max-height:34px; margin:-7px 0' />";
-		// };
+		return HTML::image($row->$field, null, array('style'=>'max-height:34px; margin:-7px 0'));
 	}
 
 	//--------------------------------------------------------------------------

@@ -17,7 +17,7 @@
 			<? foreach ($data as $row): ?>
 				<tr>
 					<? foreach ($columns as $key => $col): ?>
-						<td><?=$col->adminValueMutator($row, $key) ?></td>
+						<td><?=$col->mutator ? call_user_func_array($col->mutator, array($row) ) : $col->adminValueMutator($row, $key) ?></td>
 					<? endforeach ?>
 					<td class="text-right">
 						<? if ($link = $row->link()): ?>

@@ -30,7 +30,7 @@ class Field // implements \ArrayAccess
 
 		$type = $field['field'];
 		if (is_array($type)) {
-			$type = @$type['field'];
+			$type = @$type['type'];
 		}
 
 		$fieldClass = isset(static::$registeredFields[$type]) ? static::$registeredFields[$type] : 'BaseField';
@@ -44,89 +44,86 @@ class Field // implements \ArrayAccess
 
 	//--------------------------------------------------------------------------
 
-	public static function boot() {}
+	// public static function boot() {}
+
+	// //--------------------------------------------------------------------------
+
+	// public static function init($model, $field)
+	// {
+	// 	static $currentModel;
+	// 	static $currentField;
+
+	// 	if ($currentModel != $model->modelKeyword() || $currentField != $field)
+	// 	{
+	// 		$currentModel = $model->modelKeyword();
+	// 		$currentField = $field;
+
+	// 		$fileField = $model->fields($field);
+
+	// 		static::fieldSettings((array) @$fileField['field']);
+	// 	}
+	// }
 
 	//--------------------------------------------------------------------------
 
-	public static function init($model, $field)
-	{
-		static $currentModel;
-		static $currentField;
+	// public static function fieldSettings($settings = null, $default = null)
+	// {
+	// 	static $fieldSettings;
 
-		if ($currentModel != $model->modelKeyword() || $currentField != $field)
-		{
-			$currentModel = $model->modelKeyword();
-			$currentField = $field;
+	// 	if (is_array($settings)) {
+	// 		$fieldSettings = $settings;
+	// 	}
+	// 	elseif(is_string($settings)) {
+	// 		return isset($fieldSettings[$settings]) ? $fieldSettings[$settings] : value($default);
+	// 	}
 
-			$fileField = $model->fields($field);
-
-			static::fieldSettings((array) @$fileField['field']);
-		}
-	}
+	// 	return $fieldSettings;
+	// }
 
 	//--------------------------------------------------------------------------
 
-	public static function fieldSettings($settings = null, $default = null)
-	{
-		static $fieldSettings;
-
-		if (is_array($settings)) {
-			$fieldSettings = $settings;
-		}
-		elseif(is_string($settings)) {
-			return isset($fieldSettings[$settings]) ? $fieldSettings[$settings] : value($default);
-		}
-
-		return $fieldSettings;
-	}
+	// public static function renderField($form, $field, $value, $attr)
+	// {
+	// 	return self::makeField($form, $field, $value, $attr);
+	// }
+	// public static function makeField($form, $field, $value, $attr)
+	// {
+	// 	return \Form::text($field, $value, $attr);
+	// }
 
 	//--------------------------------------------------------------------------
 
-	public static function renderField($form, $field, $value, $attr)
-	{
-		return self::makeField($form, $field, $value, $attr);
-	}
-	public static function makeField($form, $field, $value, $attr)
-	{
-		return \Form::text($field, $value, $attr);
-	}
+	// public static function setValue($model, $field, $data)
+	// {
+	// 	if (isset($data[$field])) {
+	// 		$model->$field = $data[$field];
+	// 	}
+	// }
 
 	//--------------------------------------------------------------------------
 
-	public static function setValue($model, $field, $data)
-	{
-		if (isset($data[$field])) {
-			$model->$field = $data[$field];
-		}
-	}
+
 
 	//--------------------------------------------------------------------------
 
-	public static function setRules($model, $field, $rules)
-	{
-		return $rules;
-	}
+	// public function valueMutator()
+	// {
+	// 	return null;
+	// }
 
 	//--------------------------------------------------------------------------
 
-	public function valueMutator()
-	{
-		return null;
-	}
+	// public static function afterSave($model, $field)
+	// {
+
+	// }
 
 	//--------------------------------------------------------------------------
 
-	public static function afterSave($model, $field)
-	{
+	// public static function afterInsert($model, $field)
+	// {
 
-	}
-
-	//--------------------------------------------------------------------------
-
-	public static function afterInsert($model, $field)
-	{
-
-	}
+	// }
 
 	//--------------------------------------------------------------------------
 }

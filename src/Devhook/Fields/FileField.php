@@ -14,68 +14,49 @@ class FileField extends BaseField {
 	const SIMPLE_MODE  = 'simple';
 	const DEFAULT_MODE = 'default';
 
-	protected static $mode = self::DEFAULT_MODE;
-
 	//--------------------------------------------------------------------------
 
-	/**
-	 * Генерирует html-поле
-	 *
-	 * @param [type] $form [description]
-	 * @param [type] $field [description]
-	 * @param [type] $value [description]
-	 * @param [type] $attr [description]
-	 *
-	 * @return [type]
-	 */
-	public static function makeField($form, $field, $value, $attr)
+	public function render($value, $attr)
 	{
-		$mode = static::fieldSettings('mode');
-		if (!$mode) $mode = static::$mode;
+		switch ($this->settings('mode')) {
+			case self::SIMPLE_MODE;
+				return Form::file($this->name, $attr);
 
-		switch ($mode) {
-			case self::DEFAULT_MODE;
+			default:
 				$view = View::make('fields/file');
 
-				$view->with('settings', static::fieldSettings());
-				$view->with('mode',     $mode);
-				$view->with('mode',     $mode);
-				$view->with('form',     $form);
-				$view->with('field',    $field);
+				$view->with('field',    $this->name);
 				$view->with('file',     $value);
-				$view->with('model',    $form->model);
 				$view->with('attr',     $attr);
 
 				if ($value) {
 					$view->with('filename',     pathinfo($value, PATHINFO_BASENAME));
 					$view->with('filesize',     File::size(public_path($value)));
-					$view->with('removeAction', \Admin::url('action/delete', $form->model->modelFullKeyword(), $form->model->id, $field));
+					$view->with('removeAction', \Admin::url('action/delete', $this->model->modelFullKeyword(), $this->model->id, $this->name));
 				}
 
 				return $view;
-
-			default:
-				return Form::file($field, $attr);
 		}
 
 	}
 
 	//--------------------------------------------------------------------------
 
-	public static function setValue($model, $field, $data)
+	public function setValue($data)
 	{
-		if (empty($data[$field])) {
+		$name  = $this->name;
+		$model = $this->model;
+
+		if (empty($data[$name])) {
 			return;
 		}
 
-		$oldfile = $model->getAttribute($field);
+		$oldfile = $model->getAttribute($name);
 
-		if ($newfile = static::saveFile($model, $field, $data[$field])) {
-			$model->$field = $newfile;
+		if ($newfile = $this->saveFile($data[$name])) {
+			$model->$name = $newfile;
 
-			$model->event('saved', function($model) use($field) {
-				\FileField::afterSave($model, $field);
-			});
+			$model->event('saved', array($this, 'afterSave'));
 
 			// Удаляем старый файл
 			if ($oldfile && $oldfile != $newfile) {
@@ -86,16 +67,17 @@ class FileField extends BaseField {
 
 	//--------------------------------------------------------------------------
 
-	public static function saveFile($model, $field, $file = null)
+	public function saveFile($file = null)
 	{
-		static::init($model, $field);
-		$path = static::fieldSettings('path', function() use ($model, $field) {
-			return Config::get('devhook.publicFilesPath') . '/' . $model->modelKeyword() . '/' . $field;
+		$model = $this->model;
+		$name  = $this->name;
+		$path  = $this->settings('path', function() use ($model, $name) {
+			return Config::get('devhook.publicFilesPath') . '/' . $model->modelKeyword() . '/' . $name;
 		});
-		// die('ok');
+
 
 		if (empty($file)) {
-			$file = Input::file($field);
+			$file = Input::file($name);
 		}
 		elseif (is_string($file)) {
 			$file = new \Symfony\Component\HttpFoundation\File\File($file, false);
@@ -121,11 +103,12 @@ class FileField extends BaseField {
 
 	//--------------------------------------------------------------------------
 
-	public static function afterSave($model, $field)
+	public function afterSave()
 	{
-		static::init($model, $field);
+		$model   = $this->model;
+		$name    = $this->name;
 
-		$oldFile = $model->$field;
+		$oldFile = $model->$name;
 
 		if (!$oldFile) {
 			return;
@@ -137,7 +120,7 @@ class FileField extends BaseField {
 			return;
 		}
 
-		if ($moveFile = static::fieldSettings('moveFile')) {
+		if ($moveFile = $this->settings('moveFile')) {
 			$fileObj = new \Symfony\Component\HttpFoundation\File\File($absFile, false);
 
 			if (!($newFile = $moveFile($model, $fileObj))) {
@@ -161,7 +144,7 @@ class FileField extends BaseField {
 					File::delete(public_path($oldFile));
 				}
 
-				$model->$field = $newFile;
+				$model->$name = $newFile;
 				$model->forceSave();
 			}
 		}
@@ -169,7 +152,7 @@ class FileField extends BaseField {
 
 	//--------------------------------------------------------------------------
 
-	public static function setRules($model, $field, $rules)
+	protected function setRules($rules)
 	{
 		if ($rules && is_string($rules)) {
 			$rules = explode('|', $rules);
@@ -177,7 +160,7 @@ class FileField extends BaseField {
 			$rules = array();
 		}
 
-		if ($mimes = static::fieldSettings('mimes')) {
+		if ($mimes = $this->settings('mimes')) {
 			$rules[] = 'mimes:' . $mimes;
 		}
 

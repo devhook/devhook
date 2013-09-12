@@ -3,7 +3,7 @@
 use \Page;
 use \View;
 
-class HtmlField extends Field {
+class HtmlField extends BaseField {
 
 	//--------------------------------------------------------------------------
 
@@ -16,21 +16,20 @@ class HtmlField extends Field {
 
 	//--------------------------------------------------------------------------
 
-	public static function makeField($form, $field, $value, $attr)
+	public function render($value, $attr)
 	{
-		$editor = static::fieldSettings('editor');
+		$editor = 'ckeditor';
 		if (!$editor) $editor = static::$editor;
 
 		$view = View::make("fields/html_{$editor}");
 
-		$attr['id'] = 'i_html_field_' . $form->fieldName($field);
+		$attr['id'] = 'i_html_field_' . $this->name;
 
-		$view->with('settings', static::fieldSettings());
+		// $view->with('settings', static::fieldSettings());
 		$view->with('editor',   $editor);
-		$view->with('form',     $form);
-		$view->with('field',    $field);
+		$view->with('field',    $this->name);
 		$view->with('value',    $value);
-		$view->with('model',    $form->model);
+		$view->with('model',    $this->model);
 		$view->with('attr',     $attr);
 
 		return $view;

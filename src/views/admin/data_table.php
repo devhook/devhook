@@ -4,11 +4,10 @@
 		<thead>
 		<tr>
 			<? foreach ($columns as $key => $col): ?>
-				<? $label = isset($col['label']) ? $col['label'] : $key  ?>
 				<? if ($key == 'id'): ?>
-					<th width="1"><?=$label == 'id' ? '#' : $label ?></th>
+					<th width="1"><?=$col->label == 'id' ? '#' : $col->label ?></th>
 				<? else: ?>
-					<th><?=$label ?></th>
+					<th><?=$col->label ?></th>
 				<? endif ?>
 			<? endforeach ?>
 			<th></th>
@@ -18,7 +17,7 @@
 			<? foreach ($data as $row): ?>
 				<tr>
 					<? foreach ($columns as $key => $col): ?>
-						<td><?=$col['mutator'] ? call_user_func_array($col['mutator'], array($row) ) : $row->$key ?></td>
+						<td><?=$col->adminValueMutator($row, $key) ?></td>
 					<? endforeach ?>
 					<td class="text-right">
 						<? if ($link = $row->link()): ?>

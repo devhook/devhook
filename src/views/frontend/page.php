@@ -4,8 +4,8 @@
 	<title>Bootstrap 101 Template</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- Bootstrap -->
-	<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-	<link href="/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" media="screen">
+	<link href="/packages/devhook/devhook/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="/packages/devhook/devhook/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" media="screen">
 
 	<script src="/packages/devhook/devhook/js/jquery.js"></script>
 </head>
@@ -90,6 +90,6 @@
 
 </div><!--.container-->
 
-<script src="/bootstrap/js/bootstrap.min.js"></script>
+<script src="/packages/devhook/devhook/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>

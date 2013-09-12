@@ -7,7 +7,7 @@ class Devhook
 	//--------------------------------------------------------------------------
 
 	// protected static $componentLocations = array();
-	protected static $fieldTypes = array();
+	// protected static $fieldTypes = array();
 
 	//--------------------------------------------------------------------------
 
@@ -86,31 +86,31 @@ class Devhook
 
 	//--------------------------------------------------------------------------
 
-	public static function registerFieldType($type, $className)
-	{
-		$className::boot();
-		static::$fieldTypes[$type] = $className;
-	}
+	// public static function registerFieldType($type, $className)
+	// {
+	// 	$className::boot();
+	// 	static::$fieldTypes[$type] = $className;
+	// }
 
 	//--------------------------------------------------------------------------
 
-	public static function fieldClass($type)
-	{
-		$fieldSettings = array();
-		if (is_array($type)) {
-			$fieldSettings = $type;
-			$type = $fieldSettings['field'];
-		}
+	// public static function fieldClass($type)
+	// {
+	// 	$fieldSettings = array();
+	// 	if (is_array($type)) {
+	// 		$fieldSettings = $type;
+	// 		$type = $fieldSettings['field'];
+	// 	}
 
-		$class = isset(static::$fieldTypes[$type]) ? static::$fieldTypes[$type] : false;
+	// 	$class = isset(static::$fieldTypes[$type]) ? static::$fieldTypes[$type] : false;
 
-		if ($class) {
-			$class::fieldSettings($fieldSettings);
-			return $class;
-		}
+	// 	if ($class) {
+	// 		$class::fieldSettings($fieldSettings);
+	// 		return $class;
+	// 	}
 
-		return false;
-	}
+	// 	return false;
+	// }
 
 	//--------------------------------------------------------------------------
 

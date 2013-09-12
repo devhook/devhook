@@ -1,5 +1,6 @@
 <?php namespace Devhook;
 
+use Devhook\Fields\Field;
 use \ImageField;
 use \Validator;
 use \Config;
@@ -27,6 +28,7 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 	protected $objectEvents = array();
 	protected $valid = false;
 	protected $validator;
+	protected $fields;
 
 	//--------------------------------------------------------------------------
 
@@ -36,39 +38,21 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 
 		static::updating(function($model){
 			$fields = $model->fields();
+
 			if (isset($fields['updater_id'])) {
 				$model->updater_id = app('user')->id;
 			}
 		});
 
-		// static::created(function($model){
-		// 	static $lock = array();
-		// 	$fields = $model->fields();
-		// 	foreach ($fields as $name => $field) {
-		// 		if (empty($lock[$name])) {
-		// 			$lock[$name] = true;
-		// 			if (!empty($field['field']) && ($fieldClass = \Devhook::fieldClass($field['field']))) {
-		// 				$fieldClass::afterInsert($model, $name);
-		// 			}
-		// 			$lock[$name] = false;
-		// 		}
-		// 	}
-		// });
 		static::saved(function($model) {
 			$model->callEvent('saved');
 		});
-
-		// if (isset($field['updater_id']) && empty($this->attributes['updater_id'])) {
-		// 	$this->updater_id = app('user')->id;
-		// }
 	}
 
 	//--------------------------------------------------------------------------
 
 	public function __construct(array $attributes = array())
 	{
-		// static $booted = array();
-		// static $count = 0;
 		$this->modelClass       = get_class($this);
 		$this->modelFullKeyword = strtolower(str_replace('\\', '.', $this->modelClass));
 
@@ -80,29 +64,20 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 			$this->modelKeyword = strtolower($class);
 		}
 
-		// if ($this->adminController === true) {
-		// 	$this->adminController = 'Devhook\\DataAdminController';
-		// }
-
 		parent::__construct($attributes);
-
-		// if (empty($booted[$this->modelFullKeyword])) {
-		// 	$booted[$this->modelFullKeyword] = true;
-
-		// 	\Admin::registerModel($this);
-		// }
 	}
 
 	//--------------------------------------------------------------------------
 
-	public function newFromBuilder($attributes = array())
-	{
-		$instance = parent::newFromBuilder($attributes);
+	//FIXME: поробовать избавитсься от этого
+	// public function newFromBuilder($attributes = array())
+	// {
+	// 	$instance = parent::newFromBuilder($attributes);
 
-		$instance->fields();
+	// 	$instance->fields();
 
-		return $instance;
-	}
+	// 	return $instance;
+	// }
 
 	//--------------------------------------------------------------------------
 
@@ -207,28 +182,33 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 
 	//--------------------------------------------------------------------------
 
-	public function fields($key = null) {
-		static $fields;
+	public function fields($name = null) {
 
-		if (is_null($fields)) {
-			$customFields = (array) Config::get('fields.' . $this->modelKeyword);
-			$fields       = array_merge($this->initFields(), $customFields);
+		if (is_null($this->fields)) {
 
-			foreach ($fields as $key => $field) {
-				if ( $field && isset($field['field']) && ($field['field'] == 'image' || is_array($field['field']) && isset($field['field']['field']) && $field['field']['field'] == 'image') ) {
-					static::$imageFields[$key] = (array) $field['field'];
-					if (empty(static::$imageFields[$key]['default_size']) && isset(static::$imageFields[$key]['sizes'])) {
-						static::$imageFields[$key]['default_size'] = current(array_keys(static::$imageFields[$key]['sizes']));
-					}
-				}
+			$extendFields = (array) Config::get('fields.' . $this->modelKeyword);
+			$this->fields = array_merge($this->initFields(), $extendFields);
+
+			foreach ($this->fields as $key => $field) {
+				$this->fields[$key] = Field::make($key, $field, $this);
 			}
+
+			// foreach ($this->fields as $key => &$field) {
+			// 	//FIXME: какая то лажа:
+			// 	// if (isset($field['field']) && ($field['field'] == 'image' || is_array($field['field']) && isset($field['field']['field']) && $field['field']['field'] == 'image') ) {
+			// 	// 	static::$imageFields[$key] = (array) $field['field'];
+			// 	// 	if (empty(static::$imageFields[$key]['default_size']) && isset(static::$imageFields[$key]['sizes'])) {
+			// 	// 		static::$imageFields[$key]['default_size'] = current(array_keys(static::$imageFields[$key]['sizes']));
+			// 	// 	}
+			// 	// }
+			// }
 		}
 
-		if ($key) {
-			return isset($fields[$key]) ? $fields[$key] : false;
+		if ($name) {
+			return isset($this->fields[$name]) ? $this->fields[$name] : false;
 		}
 
-		return $fields;
+		return (array) $this->fields;
 	}
 
 	//--------------------------------------------------------------------------
@@ -377,21 +357,8 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 			$save = true;
 		}
 
-		// $modifiedFields = $this->getDirty();
-
 		if ($save && ($result = parent::save($options))) {
 			$fields = $this->fields();
-			// $this->$afterMode();
-			// $this->afterSave();
-
-			// foreach ($modifiedFields as $key => $value) {
-			// 	if (isset($fields[$key])) {
-			// 		$field = $fields[$key];
-			// 		if (!empty($field['field']) && ($fieldClass = \Devhook::fieldClass($field['field']))) {
-			// 			$fieldClass::afterSave($this, $key);
-			// 		}
-			// 	}
-			// }
 
 			return $result;
 		}

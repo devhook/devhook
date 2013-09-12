@@ -24,6 +24,8 @@ class DevhookServiceProvider extends ServiceProvider {
 		'iForm' => 'Devhook\iHtml\iForm',
 		'iMenu' => 'Devhook\iHtml\iMenu',
 
+		'Field'       => 'Devhook\Fields\Field',
+		'BaseField'   => 'Devhook\Fields\BaseField',
 		'HtmlField'   => 'Devhook\Fields\HtmlField',
 		'FileField'   => 'Devhook\Fields\FileField',
 		'ImageField'  => 'Devhook\Fields\ImageField',
@@ -67,12 +69,12 @@ class DevhookServiceProvider extends ServiceProvider {
 
 		\AdminUI::boot();
 
-		\Devhook::registerFieldType('html',   'HtmlField');
-		\Devhook::registerFieldType('file',   'FileField');
-		\Devhook::registerFieldType('image',  'ImageField');
-		\Devhook::registerFieldType('color',  'ColorField');
-		\Devhook::registerFieldType('icon',   'IconField');
-		\Devhook::registerFieldType('toggle', 'ToggleField');
+		\Field::register('html',   'HtmlField');
+		\Field::register('file',   'FileField');
+		\Field::register('image',  'ImageField');
+		\Field::register('color',  'ColorField');
+		\Field::register('icon',   'IconField');
+		\Field::register('toggle', 'ToggleField');
 	}
 
 	//--------------------------------------------------------------------------

@@ -1,30 +1,27 @@
 <?php namespace Devhook\Fields;
 
-use \Page;
 use \View;
 
-class ToggleField extends Field {
+class ToggleField extends BaseField
+{
 
 	//--------------------------------------------------------------------------
 
-	public static function makeField($form, $field, $value, $attr)
+	public function render($value, $attr)
 	{
 		$view = View::make('fields/toggle');
 
-		$id = 'i_toggle_field_' . $form->fieldName($field);
+		$name = $this->name;
+		$id   = 'i_toggle_field_' . $name;
 
-		$view->with('settings',  static::fieldSettings());
-		// $view->with('editor', $editor);
-		$view->with('id',        $id);
-		$view->with('form',      $form);
-		$view->with('field',     $field);
-		$view->with('value',     $value);
-		$view->with('model',     $form->model);
-		$view->with('attr',      $attr);
+		$view->with('id',    $id);
+		$view->with('field', $name);
+		$view->with('value', $value);
+		$view->with('attr',  $attr);
 
 		return $view;
-		// return \iElem::make('input')->attr($attr); // "<input type='color' name='{$field}' value='{$value}' />";
 	}
 
 	//--------------------------------------------------------------------------
+
 }

@@ -2,7 +2,45 @@
 
 
 
-class Field {
+class Field // implements \ArrayAccess
+{
+	//--------------------------------------------------------------------------
+
+	protected static $registeredFields = array();
+
+	//--------------------------------------------------------------------------
+
+	public static function register($name, $className)
+	{
+		$className::boot();
+		static::$registeredFields[$name] = $className;
+	}
+
+	//--------------------------------------------------------------------------
+
+	public static function make($name, $field, $model)
+	{
+		if (!$field || empty($field['field'])) {
+			return;
+		}
+
+		// if (!static::exists($field)) {
+		// 	return false;
+		// }
+
+		$type = $field['field'];
+		if (is_array($type)) {
+			$type = @$type['field'];
+		}
+
+		$fieldClass = isset(static::$registeredFields[$type]) ? static::$registeredFields[$type] : 'BaseField';
+
+		return new $fieldClass($name, $field, $model);
+	}
+
+	//--------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
 
 	//--------------------------------------------------------------------------
 
@@ -44,6 +82,10 @@ class Field {
 
 	//--------------------------------------------------------------------------
 
+	public static function renderField($form, $field, $value, $attr)
+	{
+		return self::makeField($form, $field, $value, $attr);
+	}
 	public static function makeField($form, $field, $value, $attr)
 	{
 		return \Form::text($field, $value, $attr);
@@ -67,7 +109,7 @@ class Field {
 
 	//--------------------------------------------------------------------------
 
-	public static function adminFieldMutator()
+	public function valueMutator()
 	{
 		return null;
 	}

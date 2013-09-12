@@ -7,7 +7,7 @@ use \File;
 use \Form;
 use \View;
 
-class FileField extends Field {
+class FileField extends BaseField {
 
 	//--------------------------------------------------------------------------
 

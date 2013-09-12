@@ -184,20 +184,20 @@ class ImageField extends FileField {
 
 	//--------------------------------------------------------------------------
 
-	public static function adminFieldMutator($model = null, $field = null)
+	public function adminValueMutator($model = null, $field = null)
 	{
 		$fields = $model->fields();
 
-		if (empty($fields[$field]['field'])) {
-			return null;
-		}
-
-		$fieldOpt = $fields[$field]['field'];
-		return function($row) use ($model, $field, $fieldOpt) {
-			$sizeKey = current(array_keys($fieldOpt['sizes']));
-			$src = static::imageUrl($row, $field, $sizeKey, false);
-			return "<img src='{$src}' style='max-height:34px; margin:-7px 0' />";
-		};
+		// if (empty($fields[$field]->field)) {
+		// 	return null;
+		// }
+		return '{IMG}';
+		// $fieldOpt = $fields[$field]['field'];
+		// return function($row) use ($model, $field, $fieldOpt) {
+		// 	$sizeKey = current(array_keys($fieldOpt['sizes']));
+		// 	$src = static::imageUrl($row, $field, $sizeKey, false);
+		// 	return "<img src='{$src}' style='max-height:34px; margin:-7px 0' />";
+		// };
 	}
 
 	//--------------------------------------------------------------------------

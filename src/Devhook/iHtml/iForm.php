@@ -288,9 +288,9 @@ class iForm {
 			$this->fieldPrefix = $fieldPrefix;
 		}
 
-		foreach ($allFields as $field => $prop) {
-			if ($prop && !empty($prop['field'])) {
-				$this->fields[$field] = $prop;
+		foreach ($allFields as $name => $field) {
+			if ($field && $field->type) {
+				$this->fields[$name] = $field;
 			}
 		}
 	}
@@ -410,7 +410,7 @@ class iForm {
 
 	public function fields()
 	{
-		return $this->fields;
+		return (array) $this->fields;
 	}
 
 	//--------------------------------------------------------------------------
@@ -436,29 +436,7 @@ class iForm {
 		}
 		$this->fillAttr($attr, 'field', $field);
 
-		// // Custom type
-		// if (!is_string($type) && is_callable($type)) {
-		// 	return call_user_func_array($type, array($this, $field, $value, $attr));
-		// }
-
-		// Registered type
-		if ($fieldClass = \Devhook::fieldClass($type)) {
-			return call_user_func_array(array($fieldClass, 'makeField'), array($this, $field, $value, $attr));
-		}
-
-		$fieldName = $this->fieldName($field);
-
-		switch ($type) {
-			case 'password':
-				return Form::$type($fieldName, $attr);
-
-			case 'select':
-				$options = $this->fieldOptions($field);
-				return Form::$type($fieldName, $options, $value, $attr);
-
-			default:
-				return Form::$type($fieldName, $value, $attr);
-		}
+		return $this->fields[$field]->render($value, $attr);
 	}
 
 	//--------------------------------------------------------------------------
@@ -491,10 +469,10 @@ class iForm {
 	public function fieldProperty($field, $option, $value = null)
 	{
 		if ($value !== null) {
-			$this->fields[$field][$option] = $value;
+			$this->fields[$field]->$option = $value;
 		}
 
-		$value = isset($this->fields[$field][$option]) ? $this->fields[$field][$option] : null;
+		$value = isset($this->fields[$field]->$option) ? $this->fields[$field]->$option : null;
 
 		return $value;
 	}
@@ -521,19 +499,7 @@ class iForm {
 
 	public function fieldRequired($field)
 	{
-		if (empty($this->fields[$field]) || empty($this->fields[$field][$this->rulesKey])) {
-			return false;
-		}
-		$rules = $this->fields[$field][$this->rulesKey];
-		if ( ! is_array($rules)) {
-			$rules = explode('|', $rules);
-		}
-
-		if (in_array('required', $rules)) {
-			return true;
-		}
-
-		return false;
+		return $this->fields[$field]->required;
 	}
 
 	//--------------------------------------------------------------------------
@@ -558,7 +524,7 @@ class iForm {
 
 	public function fieldType($field, $value = null)
 	{
-		return $this->fieldProperty($field, 'field', $value);
+		return $this->fieldProperty($field, 'type', $value);
 	}
 
 	//--------------------------------------------------------------------------

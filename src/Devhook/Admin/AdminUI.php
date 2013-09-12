@@ -1,6 +1,7 @@
 <?php namespace Devhook;
 
 use \View;
+use \Field;
 use \Admin;
 use \Request;
 use \Config;
@@ -184,13 +185,11 @@ class AdminUI
 			}
 
 			if (isset($fields[$key])) {
-				if (!$mutator && isset($fields[$key]['field'])) {
-					if ($fieldClass = Devhook::fieldClass($fields[$key]['field'])) {
-						$mutator = $fieldClass::adminFieldMutator($model, $key);
-					}
-				}
+				// if (!$mutator) {
+				// 	$mutator = $fields[$key]->valueMutator($model, $key);
+				// }
 				$data['columns'][$key] = $fields[$key];
-				$data['columns'][$key]['mutator'] = $mutator;
+				// $data['columns'][$key]->mutator = $mutator;
 			}
 		}
 

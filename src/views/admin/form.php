@@ -1,6 +1,7 @@
 <? $customFields = array('enabled', 'creator_id', 'created_at', 'updated_at') ?>
 <? $allFields = $form->fields() ?>
 <? $fields = array_except($allFields, $customFields) ?>
+
 <? $model = $form->model ?>
 
 <div style="max-width:700px; margin:20px auto">

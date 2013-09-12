@@ -22,5 +22,13 @@
 			"Devhook": "src/"
 		}
 	},
+	 "scripts": {
+		"post-install-cmd": [
+			"php artisan asset:publish devhook/devhook"
+		],
+		"post-update-cmd": [
+			"php artisan asset:publish devhook/devhook"
+		]
+	},
 	"minimum-stability": "dev"
 }

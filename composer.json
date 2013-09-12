@@ -9,7 +9,8 @@
 	],
 	"require": {
 		"php": ">=5.3.0",
-		"illuminate/support": "4.0.x"
+		"illuminate/support": "4.0.x",
+		"intervention/image": "dev-master"
 	},
 	"autoload": {
 		"classmap": [
@@ -21,14 +22,6 @@
 		"psr-0": {
 			"Devhook": "src/"
 		}
-	},
-	 "scripts": {
-		"post-install-cmd": [
-			"php artisan asset:publish devhook/devhook"
-		],
-		"post-update-cmd": [
-			"php artisan asset:publish devhook/devhook"
-		]
 	},
 	"minimum-stability": "dev"
 }

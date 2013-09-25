@@ -38,27 +38,27 @@ class Controller extends \Controller
 			$this->layout = Config::get('view.layout', static::DEFAULT_LAYOUT);
 		}
 
-
-		$this->afterFilter(function($route, $request, $response) {
+		$ctrl = $this;
+		$this->afterFilter(function($route, $request, $response) use ($ctrl) {
 			if ( ! method_exists($response, 'getContent')) {
 				return $response;
 			}
 
 			// Рендеринг шалблона страницы
-			if ($this->layout) {
+			if ($ctrl->layout) {
 				$content = $response->getContent();
-				$layout  = $this->layout;
+				$layout  = $ctrl->layout;
 
 				// Рендерим шаблон если он не был отрендерин до этого
-				if ( ! is_object($this->layout)) {
-					$this->makeLayout();
+				if ( ! is_object($ctrl->layout)) {
+					$ctrl->makeLayout();
 				}
 
 				if ($layout != $content) {
-					$this->layout->with('content', $content);
+					$ctrl->layout->with('content', $content);
 				}
 
-				$response->setContent($this->layout);
+				$response->setContent($ctrl->layout);
 			}
 		});
 

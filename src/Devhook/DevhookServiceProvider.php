@@ -57,6 +57,10 @@ class DevhookServiceProvider extends ServiceProvider {
 
 	public function boot()
 	{
+		if (App::runningInConsole()) {
+			return;
+		}
+
 		devhook_class_aliases($this->aliases);
 
 		App::singleton('user', function() {

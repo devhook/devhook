@@ -9,7 +9,7 @@
 <div id="devhook-navbar" class="devhook-navbar">
 	<?=AdminUI::menu('modes') ?>
 	<?=AdminUI::menu('navbar') ?>
-	<?=AdminUI::menu('tray')->elem()->reverseChilds() ?>
+	<?=AdminUI::menu('tray') ?>
 </div>
 
 <script>

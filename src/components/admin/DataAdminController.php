@@ -32,7 +32,7 @@ class DataAdminController extends AdminController
 	{
 		$form = \iForm::model($this->model);
 
-		return View::make('admin.form')
+		return View::make('admin.ui.form')
 			->with('form', $form);
 	}
 
@@ -57,7 +57,7 @@ class DataAdminController extends AdminController
 
 		$form = \iForm::model($data);
 
-		return View::make('admin.form')
+		return View::make('admin.ui.form')
 			->with('form', $form);
 	}
 

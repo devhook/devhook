@@ -4,10 +4,59 @@ use \Redirect;
 use \Input;
 use \View;
 use \File;
+use \iForm;
+use \Auth;
 
 class ActionAdminController extends \AdminController {
 
+	//-------------------------------------------------------------------------
+
+	protected $publicActions = array(
+		'getLogin',
+		'postLogin',
+	);
+
 	//--------------------------------------------------------------------------
+
+	public function getLogin()
+	{
+		$user = app('user');
+
+		if ($user->isSuperUser()) {
+			return 'Welcome!';
+		}
+
+		$this->layout = 'admin.login';
+		$this->makeLayout()->with('form', iForm::model($user));
+	}
+
+	//-------------------------------------------------------------------------
+
+	public function postLogin()
+	{
+		$user = app('user');
+
+		if ($user->validate('loginRules')) {
+			if (User::auth()) {
+				return \Admin::redirect('/');
+			}
+
+			$user->validator()->messages()->add('', 'Не верный логин или пароль');
+		}
+
+		return Redirect::back()->withErrors($user->errors())->withInput(Input::all());
+	}
+
+	//--------------------------------------------------------------------------
+
+	public function getLogout()
+	{
+		Auth::logout();
+
+		return Redirect::to('/');
+	}
+
+	//-------------------------------------------------------------------------
 
 	public function anySetMode($mode)
 	{

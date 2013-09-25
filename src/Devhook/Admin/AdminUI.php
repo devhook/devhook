@@ -33,7 +33,8 @@ class AdminUI
 
 		// TRAY
 		static::menu('tray')->add('user', app('user')->login)->icon('user');
-		// static::menu('tray')->add('user', '')->icon('user');
+		static::menu('tray', 'user')->add('action/logout', 'Выход');
+
 
 		// MODES
 		$mode = \Admin::currentMode();
@@ -56,14 +57,14 @@ class AdminUI
 			$model::initAdminUi();
 		}
 
-		return View::make('admin.navbar');
+		return View::make('admin.ui.navbar');
 	}
 
 	//--------------------------------------------------------------------------
 
 	public static function alerts()
 	{
-		return View::make('admin.alerts');
+		return View::make('admin.ui.alerts');
 	}
 
 	//--------------------------------------------------------------------------
@@ -104,7 +105,7 @@ class AdminUI
 					return $row->link();
 				};
 			}
-			return View::make('admin.breadcrumbs', $data);
+			return View::make('admin.ui.breadcrumbs', $data);
 		}
 	}
 
@@ -200,7 +201,7 @@ class AdminUI
 		}
 
 
-		return View::make('admin.data_table', $data);
+		return View::make('admin.ui.data_table', $data);
 	}
 
 }

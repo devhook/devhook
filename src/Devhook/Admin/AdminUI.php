@@ -33,7 +33,7 @@ class AdminUI
 
 		// TRAY
 		static::menu('tray')->add('user', app('user')->login)->icon('user');
-		// static::menu('tray')->add('user', '')->icon('star');
+		// static::menu('tray')->add('user', '')->icon('user');
 
 		// MODES
 		$mode = \Admin::currentMode();
@@ -141,7 +141,7 @@ class AdminUI
 
 	public static function dataTable($model, $data = null)
 	{
-		static $defaultColumnFilter = array('id', 'image', 'title', 'name', 'login', 'email', 'created_at');
+		static $defaultColumnFilter = array('id', 'image', 'title', 'name', 'login', 'email', 'price', 'created_at');
 		static $defaultData = array(
 			'columns'  => true,
 			'paginate' => true,

@@ -1,7 +1,7 @@
 <script>
 (function($){
 	$('head').append('<link href="<?=asset('packages/devhook/devhook/css/admin.css') ?>" rel="stylesheet" media="screen">')
-		.append('<link href="<?=asset('font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet" media="screen">')
+		.append('<link href="<?=asset('packages/devhook/devhook/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet" media="screen">')
 		.append('<script src="<?=asset('packages/devhook/devhook/js/admin.js') ?>"><'+'/script>');
 })(jQuery);
 </script>

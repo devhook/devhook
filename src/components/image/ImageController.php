@@ -76,13 +76,13 @@ class ImageController extends \Controller
 		$fields     = (array) $model->fields();
 		$modelField = isset($fields[$field]) ? $fields[$field] : false;
 
-		if (!$modelField || empty($modelField['field']) || !is_array($modelField['field'])) {
+		if (!$modelField || empty($modelField->type)) {
 			return parent::missingMethod($args);
 		}
 
 		$imageTypes = array('image');
-		$type       = $modelField['field']['field'];
-		$sizes      = (array) $modelField['field']['sizes'];
+		$type       = $modelField->type;
+		$sizes      = (array) $modelField->settings('sizes');
 		if (!in_array($type, $imageTypes) || empty($sizes[$sizeKey])) {
 			return parent::missingMethod($args);
 		}

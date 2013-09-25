@@ -32,11 +32,13 @@ function devhook_class_aliases($aliases)
 	$eval = '';
 	foreach ($aliases as $alias => $target) {
 		if ( ! class_exists($alias)) {
-			$eval .= "class {$alias} extends {$target} {}" . PHP_EOL;
+			class_alias($target, $alias);
+			// $eval .= "class {$alias} extends {$target} {}" . PHP_EOL;
 		}
 	}
 
 	if ($eval) {
+		echo '<pre>';print_r($eval);exit;
 		eval($eval);
 	}
 }

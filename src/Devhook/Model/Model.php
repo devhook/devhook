@@ -223,8 +223,10 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 
 	protected function initAdminUi()
 	{
-		$link  = 'data/' . $this->modelFullKeyword();
-		\AdminUi::menu('navbar', 'data')->add($link , $this->modelName());
+		if ($this->modelName) {
+			$link = 'data/' . $this->modelFullKeyword();
+			\AdminUi::menu('navbar', 'data')->add($link , $this->modelName());
+		}
 	}
 
 	//--------------------------------------------------------------------------

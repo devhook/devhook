@@ -94,9 +94,9 @@ class DataAdminController extends AdminController
 
 	public function missingMethod($args = null)
 	{
-		// if (!$args) {
-		// 	return parent::missingMethod($args);
-		// }
+		if (!$args) {
+			return;// parent::missingMethod($args);
+		}
 
 		$modelClass   = \Devhook::getClassByKey($args[0]);
 		$this->model  = new $modelClass;

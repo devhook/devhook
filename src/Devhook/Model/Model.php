@@ -96,7 +96,7 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 	{
 		if (isset($this->objectEvents['saved'])) {
 			foreach ($this->objectEvents['saved'] as $callback) {
-				$callback($this);
+				call_user_func($callback, $this);
 			}
 		}
 	}

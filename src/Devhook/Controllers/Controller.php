@@ -39,30 +39,36 @@ class Controller extends \Controller
 		}
 
 		$ctrl = $this;
-		$this->afterFilter(function($route, $request, $response) use ($ctrl) {
-			if ( ! method_exists($response, 'getContent')) {
-				return $response;
-			}
-
-			// Рендеринг шалблона страницы
-			if ($ctrl->layout) {
-				$content = $response->getContent();
-				$layout  = $ctrl->layout;
-
-				// Рендерим шаблон если он не был отрендерин до этого
-				if ( ! is_object($ctrl->layout)) {
-					$ctrl->makeLayout();
-				}
-
-				if ($layout != $content) {
-					$ctrl->layout->with('content', $content);
-				}
-
-				$response->setContent($ctrl->layout);
-			}
+		$this->afterFilter(function() use ($ctrl) {
+			return call_user_func_array(array($ctrl, 'renderLayoutCallback'), func_get_args());
 		});
 
 		$this->init();
+	}
+
+	//-------------------------------------------------------------------------
+
+	public function renderLayoutCallback($route, $request, $response){
+		if ( ! method_exists($response, 'getContent')) {
+			return $response;
+		}
+
+		// Рендеринг шалблона страницы
+		if ($this->layout) {
+			$content = $response->getContent();
+			$layout  = $this->layout;
+
+			// Рендерим шаблон если он не был отрендерин до этого
+			if ( ! is_object($this->layout)) {
+				$this->makeLayout();
+			}
+
+			if ($layout != $content) {
+				$this->layout->with('content', $content);
+			}
+
+			$response->setContent($this->layout);
+		}
 	}
 
 	//--------------------------------------------------------------------------

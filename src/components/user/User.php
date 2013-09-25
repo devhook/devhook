@@ -38,11 +38,11 @@ class User extends Model implements UserInterface, RemindableInterface
 			),
 
 			'email' => array(
-				'label'      => 'E-mail',
-				'field'      => 'text',
-				'rules'      => 'required|email|unique:' . $this->table . ($this->id ? ',email,' . $this->id : ''),
+				'label'         => 'E-mail',
+				'field'         => 'text',
+				'rules'         => 'required|email|unique:' . $this->table . ($this->id ? ',email,' . $this->id : ''),
 				// 'loginRules' => 'required|email',
-				'db'         => 'string|unique|index',
+				'db'            => 'string|unique|index',
 			),
 
 			'password' => array(
@@ -74,6 +74,7 @@ class User extends Model implements UserInterface, RemindableInterface
 
 	//--------------------------------------------------------------------------
 
+	//FIXME перенести в Auth::login
 	protected function auth($remember = null)
 	{
 		if (is_null($remember)) {

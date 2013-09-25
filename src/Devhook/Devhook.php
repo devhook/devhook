@@ -1,6 +1,6 @@
 <?php namespace Devhook;
 
-use \View;
+
 
 class Devhook
 {

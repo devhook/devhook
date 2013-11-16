@@ -33,8 +33,9 @@ class DevhookServiceProvider extends ServiceProvider {
 		'IconField'   => 'Devhook\Fields\IconField',
 		'ToggleField' => 'Devhook\Fields\ToggleField',
 
-		'Devhook' => 'Devhook\Devhook',
-		'Admin'   => 'Devhook\AdminFacade',
+		'Devhook' => 'Devhook\Facade\DevhookFacade',
+		'Admin'   => 'Devhook\Facade\AdminFacade',
+
 		'AdminUI' => 'Devhook\AdminUI',
 		'Widget'  => 'Devhook\Widget',
 

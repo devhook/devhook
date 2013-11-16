@@ -1,4 +1,4 @@
-<?php namespace Devhook;
+<?php namespace Devhook\Facades;
 
 use \Illuminate\Support\Facades\Facade;
 

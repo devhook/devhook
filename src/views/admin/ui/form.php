@@ -45,7 +45,7 @@
 		<? endforeach ?>
 
 		<button class="btn btn-primary" type="submit">Сохранить</button>
-		<input class="btn btn-default" type="submit" name="redirect_back" value="Сохранить и  вернуться" />
+		<input class="btn btn-default" type="submit" name="redirect_back" value="Сохранить и закрыть" />
 	<?=Form::close() ?>
 </div>
 

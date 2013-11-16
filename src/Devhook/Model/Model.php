@@ -1,6 +1,7 @@
 <?php namespace Devhook;
 
 use Devhook\Fields\Field;
+use \Request;
 use \ImageField;
 use \Validator;
 use \Config;
@@ -81,13 +82,12 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 
 	//--------------------------------------------------------------------------
 
-	public function event($name, $callback, $key = null)
+	public function event($name, $callback, $arguments = array())
 	{
-		if ($key) {
-			$this->objectEvents[$name][$key] = $callback;
-		} else {
-			$this->objectEvents[$name][] = $callback;
-		}
+		$this->objectEvents[$name][] = array(
+			'callback'  => $callback,
+			'arguments' => (array) $arguments,
+		);
 	}
 
 	//--------------------------------------------------------------------------
@@ -95,8 +95,9 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 	public function callEvent($name)
 	{
 		if (isset($this->objectEvents['saved'])) {
-			foreach ($this->objectEvents['saved'] as $callback) {
-				call_user_func($callback, $this);
+			foreach ($this->objectEvents['saved'] as $event) {
+				array_unshift($event['arguments'], $this);
+				call_user_func_array($event['callback'], $event['arguments']);
 			}
 		}
 	}
@@ -105,27 +106,34 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 
 	public function images()
 	{
-		return $this->morphMany('Image', 'imageable');
+		return $this->morphMany('Image', 'imageable')->orderBy('primary', 'desc');
 	}
 
 	//--------------------------------------------------------------------------
 
-	// public function image($size = null, $attr = array())
-	// {
-	// 	$force = false;
+	public function thumb()
+	{
+		return $this->morphOne('Image', 'imageable')->where('primary', 1);
+	}
 
-	// 	if ($this->image && isset(static::$imageFields['image'])) {
-	// 		if (!$size) {
-	// 			$size = static::$imageFields['image']['default_size'];
-	// 		}
+	//--------------------------------------------------------------------------
 
-	// 		$src = ImageField::imageUrl($this, 'image', $size, $force);
+	public function image($size = null, $attr = array())
+	{
+		$force = false;
 
-	// 		return app('html')->image($src, null, $attr);
-	// 	}
+		if ($this->image && isset(static::$imageFields['image'])) {
+			if (!$size) {
+				$size = static::$imageFields['image']['default_size'];
+			}
 
-	// 	return '';
-	// }
+			$src = ImageField::imageUrl($this, 'image', $size, $force);
+
+			return app('html')->image($src, null, $attr);
+		}
+
+		return '';
+	}
 
 	//--------------------------------------------------------------------------
 
@@ -223,9 +231,10 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 
 	protected function initAdminUi()
 	{
-		if ($this->modelName) {
+		if ($this->modelName && Request::is(Admin::adminRoute('data*'))) {
 			$link = 'data/' . $this->modelFullKeyword();
-			\AdminUi::menu('navbar', 'data')->add($link , $this->modelName());
+			AdminUI::menu('subnav')->add($link , $this->modelName());
+			// \AdminUi::menu('navbar', 'data')->add($link , $this->modelName());
 		}
 	}
 
@@ -237,10 +246,12 @@ class Model extends \Illuminate\Database\Eloquent\Model {
 			'list' => array(
 				'title' => 'Просмотр',
 				'link'  => $this->listAction(),
+				'icon' => 'list'
 			),
 			'add' => array(
 				'title' => 'Добавить',
 				'link'  => $this->addAction(),
+				'icon' => 'plus'
 			),
 		);
 	}

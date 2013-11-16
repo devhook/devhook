@@ -80,14 +80,16 @@ class ActionAdminController extends \AdminController {
 	public function getDelete($modelKey, $id, $fieldName = null)
 	{
 		$modelClass = \Devhook::getClassByKey($modelKey);
-		$model      = $modelClass::find($id);
 
-		if (is_null($fieldName)) {
-			$model->delete();
-		} else {
-			if (File::delete(public_path($model->$fieldName))) {
-				$model->$fieldName = '';
-				$model->forceSave();
+
+		if ($model = $modelClass::find($id)) {
+			if (is_null($fieldName)) {
+				$model->delete();
+			} else {
+				if (File::delete(public_path($model->$fieldName))) {
+					$model->$fieldName = '';
+					$model->forceSave();
+				}
 			}
 		}
 

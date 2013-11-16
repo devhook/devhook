@@ -4,9 +4,9 @@
 
 //--------------------------------------------------------------------------
 
-$navbar-height:  36px;
+$navbar-height:  40px;
 $navbar-padding: 5px;
-$navbar-bg:      #555;
+$navbar-bg:      #444;
 
 $accent-color: #0099cc;
 
@@ -23,13 +23,17 @@ $accent-color: #0099cc;
 	width:         100%;
 	top:           0;
 
-	@include background(linear-gradient(top, $navbar-bg, darken($navbar-bg, 10%)));
+	@include background(linear-gradient(top, $navbar-bg, darken($navbar-bg, 5%)));
 	@include box-shadow(0 0 10px rgba(0,0,0,.2), 0 0 0 1px rgba(255,255,255,.1), 0 0 4px rgba(0,0,0,.3) inset);
 
 	> * {
-		font: 13px/20px Arial;
+		font-family:   "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size:     14px;
+		line-height:   1.428571429;
 	}
-
+	a {
+		text-decoration: none;
+	}
 	ul, li {
 		margin:     0;
 		padding:    0;
@@ -136,11 +140,11 @@ $accent-color: #0099cc;
 		overflow: hidden;
 		boreder:  none;
 
-		@include border-radius(3px);
+		@include border-radius(1px);
 		@include box-shadow(none);
 
 		> li > a {
-			padding:     0 10px;
+			padding:     0 20px;
 			height:      $navbar-height - $navbar-padding * 2;
 			line-height: $navbar-height - $navbar-padding * 2;
 			background:  rgba(0,0,0,.3);
@@ -148,7 +152,9 @@ $accent-color: #0099cc;
 		}
 		> li.active > a {
 			background: $accent-color;
-			@include box-shadow(none);
+			border-bottom: none;
+			@include background(linear-gradient(top, $accent-color, darken($accent-color, 5%)));
+			@include box-shadow(inset 0 1px 1px rgba(255,255,255,.3));
 		}
 
 		// $accent-color: #A00;

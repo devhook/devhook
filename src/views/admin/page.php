@@ -19,7 +19,7 @@
 
 	<? $subnav = AdminUI::menu('subnav') ?>
 	<? if ($subnav->elem()->childs()): ?>
-		<div class="navbar navbar-default navbar-fixed-top size-sm" style="top:36px">
+		<div class="navbar navbar-default navbar-fixed-top size-sm" style="top:40px">
 			<div class="container">
 				<?=$subnav->elem()->className('nav navbar-nav pull-left') ?>
 			</div>

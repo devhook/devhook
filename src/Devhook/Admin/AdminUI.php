@@ -167,6 +167,8 @@ class AdminUI
 			$query = $model->newQuery();
 			$fn($query);
 
+			$query->with('images');
+
 			if ($data['paginate']) {
 				$limit = $data['paginate'] === true ? 30 : $data['paginate'];
 				$data['data'] = $query->paginate($limit);

@@ -20,12 +20,16 @@ class ImageField extends FileField {
 	//--------------------------------------------------------------------------
 
 	protected static $imageRoute;
+	protected static $globalSizes;
+	protected static $adminImageSizeKey;
 
 	//--------------------------------------------------------------------------
 
 	public static function boot()
 	{
-		self::$imageRoute = Config::get('devhook.imageRoute');
+		self::$imageRoute        = Config::get('devhook.imageRoute');
+		self::$globalSizes       = Config::get('devhook.imageFieldSizes');
+		self::$adminImageSizeKey = Config::get('devhook.adminImageSizeKey');
 	}
 
 	//--------------------------------------------------------------------------
@@ -35,6 +39,8 @@ class ImageField extends FileField {
 		if (empty($this->settings['mimes'])) {
 			$this->settings['mimes'] = 'jpeg,bmp,png,gif';
 		}
+
+		$this->settings['sizes'] = array_merge(self::$globalSizes, (array) $this->settings['sizes']);
 	}
 
 	//--------------------------------------------------------------------------
@@ -89,7 +95,7 @@ class ImageField extends FileField {
 		$mode = $this->settings('mode', self::DEFAULT_MODE);
 		$name = $this->name;
 
-		if ($mode == self::DEFAULT_MODE) {
+		if ($mode != self::MULTIPLE_MODE) {
 			return parent::setValue($data);
 		}
 
@@ -99,21 +105,22 @@ class ImageField extends FileField {
 
 
 		if ($newfile = $this->saveFile($data[$name])) {
-			if ( ! $model->$name) {
-				$model->$name = $newfile;
+
+			if (!$this->model->$name) {
+				$this->model->$name = $newfile;
 			}
 
-			$model->event('saved', array($this, 'afterSave'));
+			$this->model->event('saved', array($this, 'afterSave'), array($newfile));
 		}
 	}
 
 	//--------------------------------------------------------------------------
 
-	public function afterSave()
+	public function afterSave($model=null, $newfile=null)
 	{
 		$name     = $this->name;
 		$model    = $this->model;
-		$filepath = $model->$name;
+		$filepath = $newfile;
 
 		if ( ! $filepath) {
 			return;
@@ -131,7 +138,6 @@ class ImageField extends FileField {
 		$image->path           = $filepath;
 		$image->primary        = $filepath == $model->getAttribute($name);
 		$image->forceSave();
-
 
 		if ($moveFile = $this->settings('moveFile')) {
 			$fileObj = new \Symfony\Component\HttpFoundation\File\File($absFile, false);
@@ -163,11 +169,28 @@ class ImageField extends FileField {
 		}
 	}
 
+	//-------------------------------------------------------------------------
+
+	public function url()
+	{
+		$force = false;
+		$force = $force ? 'force/' : '';
+
+		// return self::$imageRoute . $force . $this->imageable_type . '/' . $this->imageable_id;
+	}
+
 	//--------------------------------------------------------------------------
 
 	public function adminValueMutator($row = null, $field = null)
 	{
-		return HTML::image($row->$field, null, array('style'=>'max-height:34px; margin:-7px 0'));
+		$primary = false;
+		foreach ($row->images as $img) {
+			if ($img->primary) {
+				$primary = $img;
+				break;
+			}
+		}
+		return $primary ? HTML::image($primary->src(self::$adminImageSizeKey), null, array('style'=>'max-height:34px; margin:-7px 0')) : '';
 	}
 
 	//--------------------------------------------------------------------------

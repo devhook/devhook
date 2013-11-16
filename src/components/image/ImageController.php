@@ -60,7 +60,6 @@ class ImageController extends \Controller
 			@list($field, $file) = $parts;
 			@list($sizeKey, $ext) = explode('.', $file);
 		}
-
 		if (!$field || !$sizeKey || $ext != 'jpg') {
 			return parent::missingMethod($args);
 		}
@@ -83,9 +82,12 @@ class ImageController extends \Controller
 		$imageTypes = array('image');
 		$type       = $modelField->type;
 		$sizes      = (array) $modelField->settings('sizes');
+		$imageAdminThumb = Config::get('devhook.imageAdminThumb');
 		if (!in_array($type, $imageTypes) || empty($sizes[$sizeKey])) {
 			return parent::missingMethod($args);
 		}
+
+		$watermark = $modelField->settings('watermark');
 		$size = $sizes[$sizeKey];
 
 		$width   = $size[0];
@@ -103,12 +105,20 @@ class ImageController extends \Controller
 			$imageFile = $model->$field;
 		}
 
-		$image = IMG::make(public_path($imageFile));
+
+		ini_set('memory_limit', '200M');
+		$image = new IMG(public_path($imageFile));
 
 		if ($crop) {
 			$image->grab($width, $hegiht);
 		} else {
 			$image->resize($width, $hegiht, true);
+		}
+
+		if ($watermark) {
+			if (!$watermark['sizes'] || in_array($sizeKey, $watermark['sizes'])) {
+				$image->insert($watermark['image'], $watermark['offset'][0], $watermark['offset'][1], $watermark['position']);
+			}
 		}
 
 		$tmpFile = public_path($model->$field) . '.tmp_' . uniqid();

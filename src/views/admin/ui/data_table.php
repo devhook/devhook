@@ -20,10 +20,10 @@
 						<td><?=$col->mutator ? call_user_func_array($col->mutator, array($row) ) : $col->adminValueMutator($row, $key) ?></td>
 					<? endforeach ?>
 					<td class="text-right">
-						<? if ($link = $row->link()): ?>
-							<a href="<?=$link ?>" class="btn btn-xs btn-default"><i class="icon-eye-open"></i></a>
+						<? if ($link = $row->link): ?>
+							<a href="<?=URL::to($link) ?>" class="btn btn-xs btn-default"><i class="icon-eye-open"></i></a>
 						<? endif ?>
-						<? $actions = $row->rowActions() ?>
+						<? $actions = $row->getRowActions() ?>
 						<? $defClass = array('remove'=>'danger', 'edit'=>'primary') ?>
 						<? $defIcon = array('remove'=>'remove', 'edit'=>'pencil') ?>
 						<? foreach ($actions as $key => $act): ?>
@@ -31,7 +31,7 @@
 							<? $icon  = isset($act['icon']) ? $act['icon'] : (isset($defIcon[$key]) ? $defIcon[$key] : '') ?>
 							<? $icon  = $icon ? "<i class='icon-{$icon}'></i> " : '' ?>
 							<? if (!empty($act['link'])): ?>
-								<a href="<?=Admin::url($act['link']) ?>" class="btn btn-xs btn-<?=$class ?>"><?=$icon . $act['title'] ?></a>
+								<a href="<?=URL::to(Devhook::backendRoute($act['link'])) ?>" class="btn btn-xs btn-<?=$class ?>"><?=$icon . $act['title'] ?></a>
 							<? else: ?>
 								<span class="btn btn-xs btn-<?=$class ?>"><?=$icon . $act['title'] ?></span>
 							<? endif ?>

@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
 @import 'compass/css3';
 
@@ -6,9 +6,9 @@
 
 $navbar-height:  40px;
 $navbar-padding: 5px;
-$navbar-bg:      #444;
+$navbar-bg:      rgb(50,60,70);
 
-$accent-color: #0099cc;
+$accent-color: #1f8dd6;
 
 /***************************************************************************
 	navbar:
@@ -18,13 +18,16 @@ $accent-color: #0099cc;
 	position:      fixed;
 	z-index:       2000;
 	background:    $navbar-bg;
-	border-bottom: 1px solid darken($navbar-bg, 20%);
+	border-bottom: 3px solid darken($navbar-bg, 10%);
 	height:        $navbar-height;
 	width:         100%;
 	top:           0;
+	text-shadow:   0 1px 1px rgba(0,0,0,.33);
 
-	@include background(linear-gradient(top, $navbar-bg, darken($navbar-bg, 5%)));
-	@include box-shadow(0 0 10px rgba(0,0,0,.2), 0 0 0 1px rgba(255,255,255,.1), 0 0 4px rgba(0,0,0,.3) inset);
+
+	@include box-sizing(border-box);
+	@include background(linear-gradient(top, darken($navbar-bg, 10%), $navbar-bg));
+	@include box-shadow(0 1px 1px rgba(0,0,0,.2) inset);
 
 	> * {
 		font-family:   "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -42,7 +45,7 @@ $accent-color: #0099cc;
 	> ul {
 		float:       left;
 		// padding:     0 $navbar-padding;
-		border-left: 5px solid rgba(0,0,0,.3);
+		border-left: 1px solid darken($navbar-bg, 10%);
 
 		// @include box-shadow(0 0 3px rgba(#FFF, .2) inset);
 
@@ -60,7 +63,7 @@ $accent-color: #0099cc;
 
 
 			> *:first-child {
-				color:       #AAA;
+				color:       #EEE;
 				// background:  rgba(0,0,0,.15);
 				// border:      1px solid mix($navbar-bg, #FFF, 90%);
 				display:     block;
@@ -74,22 +77,23 @@ $accent-color: #0099cc;
 			}
 
 			&.active > *:first-child {
-				color: #EEE;
-				// background-color: lighten($navbar-bg, 30%);
+				color: #FFF;
+				background-color: $accent-color;
 				// background-image: linear-gradient(top, rgba(#FFF, .5), rgba(#FFF, 0));
 				// text-shadow: 0 0 5px rgba(255,255,255,.7);
 				//
-				text-shadow:      0 1px 1px rgba(#000,.3);
-				border-bottom:    3px solid $accent-color;
-				background-color: rgba(#000, .2);
+
+				text-shadow:      0 1px 1px rgba(#000,.1);
+				// border-bottom:    3px solid darken($accent-color, 10%);
+
 				background-image: linear-gradient(bottom, rgba($accent-color, .25), rgba($accent-color, 0) 50%);
 			}
 			&:hover > *:first-child,
 			> *:first-child:hover {
-				background:      rgba(#000, .1);
+				// background:      rgba(#000, .1);
 				color:           #FFF;
 				text-decoration: none;
-				border-bottom:   3px solid #FFF;
+				border-bottom:   $accent-color;
 			}
 
 			// LEVEL 2
@@ -134,32 +138,6 @@ $accent-color: #0099cc;
 				}
 			}
 		}
-	}
-	> ul.dh-modes {
-		margin:   $navbar-padding;
-		overflow: hidden;
-		boreder:  none;
-
-		@include border-radius(1px);
-		@include box-shadow(none);
-
-		> li > a {
-			padding:     0 20px;
-			height:      $navbar-height - $navbar-padding * 2;
-			line-height: $navbar-height - $navbar-padding * 2;
-			background:  rgba(0,0,0,.3);
-			@include box-shadow(0 1px 1px rgba(#000, .3) inset);
-		}
-		> li.active > a {
-			background: $accent-color;
-			border-bottom: none;
-			@include background(linear-gradient(top, $accent-color, darken($accent-color, 5%)));
-			@include box-shadow(inset 0 1px 1px rgba(255,255,255,.3));
-		}
-
-		// $accent-color: #A00;
-		// border-bottom:    3px solid $accent-color;
-		// background-image: linear-gradient(bottom, rgba($accent-color, .3), rgba($accent-color, .1) 30%, rgba($accent-color, 0));
 	}
 }
 

@@ -67,10 +67,10 @@ class User extends Model implements UserInterface, RemindableInterface
 
 	//--------------------------------------------------------------------------
 
-	protected function initAdminUi()
-	{
-		// \AdminUi::menu('navbar')->add('users' , 'Пользователи')->icon('group');
-	}
+	// protected function initBackendMenu()
+	// {
+	// 	// \AdminUi::menu('navbar')->add('users' , 'Пользователи')->icon('group');
+	// }
 
 	//--------------------------------------------------------------------------
 
@@ -105,7 +105,7 @@ class User extends Model implements UserInterface, RemindableInterface
 
 	protected function loginFields()
 	{
-		return array_only($this->fields(), array('login', 'password'));
+		return array_only($this->getFields(), array('login', 'password'));
 	}
 
 	//--------------------------------------------------------------------------

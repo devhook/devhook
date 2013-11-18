@@ -40,6 +40,10 @@ class ImageField extends FileField {
 			$this->settings['mimes'] = 'jpeg,bmp,png,gif';
 		}
 
+		if (empty($this->settings['model'])) {
+			$this->settings['model'] = 'Image';
+		}
+
 		$this->settings['sizes'] = array_merge(self::$globalSizes, (array) $this->settings['sizes']);
 	}
 
@@ -70,7 +74,7 @@ class ImageField extends FileField {
 					$exists = file_exists(public_path($value));
 					$view->with('filename',     pathinfo($value, PATHINFO_BASENAME));
 					$view->with('filesize',     $exists ? File::size(public_path($value)) : 0);
-					$view->with('removeAction', \Admin::url('action/delete', $model->modelFullKeyword(), $model->id, $this->name));
+					$view->with('removeAction', URL::to(Devhook::backendRoute('action/delete', $model->getModelFullKeyword(), $model->id, $this->name)));
 				}
 				break;
 		}
@@ -110,13 +114,17 @@ class ImageField extends FileField {
 				$this->model->$name = $newfile;
 			}
 
-			$this->model->event('saved', array($this, 'afterSave'), array($newfile));
+			$modelClass = get_class($this->model);
+			$field      = $this;
+			$modelClass::saved(function() use ($field, $newfile) {
+				$field->afterSave($newfile);
+			});
 		}
 	}
 
 	//--------------------------------------------------------------------------
 
-	public function afterSave($model=null, $newfile=null)
+	public function afterSave($newfile=null)
 	{
 		$name     = $this->name;
 		$model    = $this->model;
@@ -131,10 +139,10 @@ class ImageField extends FileField {
 		if (!file_exists($absFile)) {
 			return;
 		}
-
-		$image = new Image;
+		$imageModel = $this->settings('model');
+		$image = new $imageModel;
 		$image->imageable_id   = $model->getKey();
-		$image->imageable_type = $model->modelKeyword();
+		$image->imageable_type = $model->getModelKeyword();
 		$image->path           = $filepath;
 		$image->primary        = $filepath == $model->getAttribute($name);
 		$image->forceSave();
@@ -171,26 +179,22 @@ class ImageField extends FileField {
 
 	//-------------------------------------------------------------------------
 
-	public function url()
-	{
-		$force = false;
-		$force = $force ? 'force/' : '';
+	// public function url()
+	// {
+	// 	$force = false;
+	// 	$force = $force ? 'force/' : '';
 
-		// return self::$imageRoute . $force . $this->imageable_type . '/' . $this->imageable_id;
-	}
+	// 	// return self::$imageRoute . $force . $this->imageable_type . '/' . $this->imageable_id;
+	// }
 
 	//--------------------------------------------------------------------------
 
 	public function adminValueMutator($row = null, $field = null)
 	{
-		$primary = false;
-		foreach ($row->images as $img) {
-			if ($img->primary) {
-				$primary = $img;
-				break;
-			}
+		if ($row->$field) {
+			$img =  Config::get('devhook.imageRoute') . '/' . $row->getModelKeyword() . '/' . $row->getKey() . '/' . $field . '-' . self::$adminImageSizeKey . '.jpg';
+			return HTML::image($img, null, array('style'=>'max-height:34px; margin:-7px 0'));
 		}
-		return $primary ? HTML::image($primary->src(self::$adminImageSizeKey), null, array('style'=>'max-height:34px; margin:-7px 0')) : '';
 	}
 
 	//--------------------------------------------------------------------------

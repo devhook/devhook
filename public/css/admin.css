@@ -1,25 +1,22 @@
 /***************************************************************************
 	navbar:
 ***************************************************************************/
-.devhook-navbar { position: fixed; z-index: 2000; background: #444444; border-bottom: 1px solid #111111; height: 40px; width: 100%; top: 0; background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #444444), color-stop(100%, #373737)); background: -webkit-linear-gradient(top, #444444, #373737); background: -moz-linear-gradient(top, #444444, #373737); background: -o-linear-gradient(top, #444444, #373737); background: linear-gradient(top, #444444, #373737); -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 4px rgba(0, 0, 0, 0.3) inset; -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 4px rgba(0, 0, 0, 0.3) inset; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 4px rgba(0, 0, 0, 0.3) inset; }
+.devhook-navbar { position: fixed; z-index: 2000; background: #323c46; border-bottom: 3px solid #1d2228; height: 40px; width: 100%; top: 0; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.33); -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #1d2228), color-stop(100%, #323c46)); background: -webkit-linear-gradient(top, #1d2228, #323c46); background: -moz-linear-gradient(top, #1d2228, #323c46); background: -o-linear-gradient(top, #1d2228, #323c46); background: linear-gradient(top, #1d2228, #323c46); -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset; -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset; }
 .devhook-navbar > * { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.428571429; }
 .devhook-navbar a { text-decoration: none; }
 .devhook-navbar ul, .devhook-navbar li { margin: 0; padding: 0; list-style: none; }
-.devhook-navbar > ul { float: left; border-left: 5px solid rgba(0, 0, 0, 0.3); }
+.devhook-navbar > ul { float: left; border-left: 1px solid #1d2228; }
 .devhook-navbar > ul:first-child { border-left: none; }
 .devhook-navbar > ul.dh-tray { float: right; }
 .devhook-navbar > ul > li { display: block; float: left; }
-.devhook-navbar > ul > li > *:first-child { color: #AAA; display: block; padding: 0 15px; height: 40px; line-height: 40px; }
-.devhook-navbar > ul > li.active > *:first-child { color: #EEE; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3); border-bottom: 3px solid #0099cc; background-color: rgba(0, 0, 0, 0.2); background-image: linear-gradient(bottom, rgba(0, 153, 204, 0.25), rgba(0, 153, 204, 0) 50%); }
-.devhook-navbar > ul > li:hover > *:first-child, .devhook-navbar > ul > li > *:first-child:hover { background: rgba(0, 0, 0, 0.1); color: #FFF; text-decoration: none; border-bottom: 3px solid #FFF; }
+.devhook-navbar > ul > li > *:first-child { color: #EEE; display: block; padding: 0 15px; height: 40px; line-height: 40px; }
+.devhook-navbar > ul > li.active > *:first-child { color: #FFF; background-color: #1f8dd6; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1); background-image: linear-gradient(bottom, rgba(31, 141, 214, 0.25), rgba(31, 141, 214, 0) 50%); }
+.devhook-navbar > ul > li:hover > *:first-child, .devhook-navbar > ul > li > *:first-child:hover { color: #FFF; text-decoration: none; border-bottom: #1f8dd6; }
 .devhook-navbar > ul > li > ul { display: none; position: absolute; min-width: 150px; overflow: hidden; -webkit-border-radius: 0 0 5px 5px; -moz-border-radius: 0 0 5px 5px; -ms-border-radius: 0 0 5px 5px; -o-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; -webkit-box-shadow: 0 3px 21px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 3px 21px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1); box-shadow: 0 3px 21px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1); }
 .devhook-navbar > ul > li > ul > li { display: block; }
 .devhook-navbar > ul > li > ul > li > a { font-size: 14px; color: #333; background: #FFF; display: block; padding: 7px 15px; margin-bottom: -1px; }
 .devhook-navbar > ul > li > ul > li > a:hover { text-decoration: none; color: #333; background-image: linear-gradient(top, #eeeeee, #dddddd); }
-.devhook-navbar > ul > li > ul > li.active > a { border-left: 3px solid #0099cc; color: #666; }
-.devhook-navbar > ul.dh-modes { margin: 5px; overflow: hidden; boreder: none; -webkit-border-radius: 1px; -moz-border-radius: 1px; -ms-border-radius: 1px; -o-border-radius: 1px; border-radius: 1px; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; }
-.devhook-navbar > ul.dh-modes > li > a { padding: 0 20px; height: 30px; line-height: 30px; background: rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3) inset; -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3) inset; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3) inset; }
-.devhook-navbar > ul.dh-modes > li.active > a { background: #0099cc; border-bottom: none; background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #0099cc), color-stop(100%, #0086b3)); background: -webkit-linear-gradient(top, #0099cc, #0086b3); background: -moz-linear-gradient(top, #0099cc, #0086b3); background: -o-linear-gradient(top, #0099cc, #0086b3); background: linear-gradient(top, #0099cc, #0086b3); -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3); -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3); }
+.devhook-navbar > ul > li > ul > li.active > a { border-left: 3px solid #1f8dd6; color: #666; }
 
 .dropdown { position: relative; }
 .dropdown:hover ul { display: block; }

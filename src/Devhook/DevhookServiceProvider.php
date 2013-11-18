@@ -33,14 +33,14 @@ class DevhookServiceProvider extends ServiceProvider {
 		'IconField'   => 'Devhook\Fields\IconField',
 		'ToggleField' => 'Devhook\Fields\ToggleField',
 
-		'Devhook' => 'Devhook\Facade\DevhookFacade',
-		'Admin'   => 'Devhook\Facade\AdminFacade',
+		'Devhook' => 'Devhook\Facades\DevhookFacade',
+		'AdminUI' => 'Devhook\Facades\AdminUIFacade',
 
-		'AdminUI' => 'Devhook\AdminUI',
 		'Widget'  => 'Devhook\Widget',
 
-		'User'    => 'Devhook\User',
-		'Image'   => 'Devhook\Image',
+		'User'      => 'Devhook\User',
+		'Image'     => 'Devhook\Image',
+		'HtmlBlock' => 'Devhook\HtmlBlock',
 	);
 
 	protected $defer = false;
@@ -49,8 +49,11 @@ class DevhookServiceProvider extends ServiceProvider {
 
 	public function register()
 	{
-		$this->app['admin'] = $this->app->share(function($app) {
-			return Admin::get_instance();
+		$this->app['devhook'] = $this->app->share(function($app) {
+			return Devhook::get_instance();
+		});
+		$this->app['adminUI'] = $this->app->share(function($app) {
+			return AdminUI::get_instance();
 		});
 	}
 
@@ -72,7 +75,7 @@ class DevhookServiceProvider extends ServiceProvider {
 
 		View::share('user', $this->app->user);
 
-		\AdminUI::boot();
+		// \AdminUI::boot();
 
 		\Field::register('html',   'HtmlField');
 		\Field::register('file',   'FileField');
@@ -86,7 +89,7 @@ class DevhookServiceProvider extends ServiceProvider {
 
 	public function provides()
 	{
-		return array('admin');
+		return array('devhook', 'adminUI');
 	}
 
 	//--------------------------------------------------------------------------

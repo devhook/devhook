@@ -1,12 +1,12 @@
 <? $customFields = array('enabled', 'creator_id', 'created_at', 'updated_at') ?>
-<? $allFields = $form->fields() ?>
+<? $allFields = $form->getFields() ?>
 <? $fields = array_except($allFields, $customFields) ?>
 
 <? $model = $form->model ?>
 
 <div style="max-width:700px; margin:20px auto">
 	<?=Form::open(array('class'=>'form', 'enctype'=>'multipart/form-data')) ?>
-		<? if (array_only($form->model->fields(), $customFields)): ?>
+		<? if (array_only($form->model->getFields(), $customFields)): ?>
 			<div class='form-group row'>
 
 				<div class="col-md-3">

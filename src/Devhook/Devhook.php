@@ -1,13 +1,21 @@
 <?php namespace Devhook;
 
 
+//  use \Redirect;
+use \Request;
+use \Config;
+//  use \Route;
+//  use \URL;
+
 
 class Devhook
 {
 	//--------------------------------------------------------------------------
 
-	// protected static $componentLocations = array();
-	// protected static $fieldTypes = array();
+	protected static $instance;
+
+	protected $backendRoute;
+	protected $loadedModels = array();
 
 	//--------------------------------------------------------------------------
 
@@ -18,9 +26,81 @@ class Devhook
 	// 	}
 	// }
 
+	//-------------------------------------------------------------------------
+
+	public static function get_instance()
+	{
+		if (is_null(static::$instance)) {
+			static::$instance = new static;
+		}
+
+		return static::$instance;
+	}
+
 	//--------------------------------------------------------------------------
 
-	public static function scanModels()
+	protected function __construct()
+	{
+		$this->backendRoute = Config::get('devhook.backendRoute', 'admin');
+	}
+
+	//--------------------------------------------------------------------------
+
+	public function backendAllowed()
+	{
+		static $enable;
+
+		if ($enable === null) {
+			$enable = app('user')->isSuperUser();
+		}
+
+		return $enable;
+	}
+
+	//-------------------------------------------------------------------------
+
+	// public function backendRoute($route, $callback = null)
+	// {
+	// 	if ( ! Request::is($this->backendRoute() . '*')) {
+	// 		return;
+	// 	}
+
+	// 	if (is_callable($route)) {
+	// 		$callback = $route;
+	// 		$route    = null;
+	// 	}
+
+	// 	Route::group(array('prefix' => $this->backendRoute($route)), $callback);
+	// }
+
+	//--------------------------------------------------------------------------
+
+	public function backendRoute($args = null)
+	{
+		if ($args) {
+			return $this->backendRoute . '/' . implode('/', func_get_args());
+		}
+
+		return $this->backendRoute;
+	}
+
+	//-------------------------------------------------------------------------
+
+	public function isBackend()
+	{
+		static $mode;
+
+		if (is_null($mode)) {
+			$mode = Request::is($this->backendRoute . '*');
+		}
+
+		return $mode;
+	}
+
+
+	//-------------------------------------------------------------------------
+
+	public function scanModels()
 	{
 		$components = static::getComponents();
 		$models     = array();

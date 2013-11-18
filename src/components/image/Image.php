@@ -1,5 +1,6 @@
 <?php namespace Devhook;
 
+use \Devhook;
 use \Config;
 use \File;
 use \URL;
@@ -91,7 +92,7 @@ class Image extends \Model {
 
 	public function removeAction()
 	{
-		return \Admin::url('action/delete', $this->modelFullKeyword(), $this->id);
+		return URL::to(Devhook::backendRoute('action/delete', $this->getModelFullKeyword(), $this->id));
 	}
 
 	//--------------------------------------------------------------------------

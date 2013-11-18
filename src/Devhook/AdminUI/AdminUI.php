@@ -5,56 +5,85 @@ use \Field;
 use \Admin;
 use \Request;
 use \Config;
+// use \Devhook;
 
 class AdminUI
 {
 	//--------------------------------------------------------------------------
 
-	public static function boot()
-	{
-		static $booted;
+	public $menu;
 
-		if ( ! \Admin::enable()) {
+	//-------------------------------------------------------------------------
+
+	protected static $instance;
+	protected $devhook;
+
+	//-------------------------------------------------------------------------
+
+	public static function get_instance()
+	{
+		if (is_null(static::$instance)) {
+			static::$instance = new static;
+		}
+
+		return static::$instance;
+	}
+
+	//-------------------------------------------------------------------------
+
+	protected function __construct()
+	{
+		$this->devhook = app()->devhook;
+
+		if ( ! $this->devhook->backendAllowed()) {
 			return;
 		}
 
-		if (!$booted) {
-			$booted = true;
-			static::bootMenu();
-		}
+		$this->menu = new AdminUiMenu;
+		$this->bootMenu();
 	}
 
 	//--------------------------------------------------------------------------
 
-	public static function bootMenu()
+	public function bootMenu()
 	{
-		// Data
-		static::menu('navbar')->add('data', 'Данные')->icon('folder-close');
-
-		// TRAY
-		static::menu('tray')->add('user', app('user')->login)->icon('user');
-		static::menu('tray', 'user')->add('action/logout', 'Выход');
-
 
 		// MODES
-		$mode = \Admin::currentMode();
-		static::menu('modes')->add('action/set-mode/site', 'Caйт')->active($mode == 'site');
-		static::menu('modes')->add('action/set-mode/admin', 'Управление')->active($mode == 'admin');
+		$isBackend = $this->devhook->isBackend();
+		$this->menu->add('navbar.site', 'action/set-mode/site', 'Caйт')->icon('globe')->active(!$isBackend);
+
+		// $this->menu('navbar')->add('action/set-mode/site', 'Caйт')->icon('globe')->active(!$isBackend);
+		// $this->menu('modes')->add('action/set-mode/admin', 'Управление')->active($isBackend);
+
+		// Data
+		// $this->menu('navbar')->add('data', 'Данные')->icon('folder-close');
+
+		// TRAY
+		$this->menu('tray')->add('user', app('user')->login)->icon('user');
+		$this->menu('tray', 'user')->add('action/logout', 'Выход');
+
+		$models = (array) $this->devhook->scanModels();
+		foreach ($models as $model => $path) {
+			$model::initBackend($this);
+		}
 	}
+
+	/***************************************************************************
+		!!! NEW UI Methods:
+	***************************************************************************/
+
+	// public function addMenuItem($itemKey, $backendAction, $title = null) {
+
+	// }
 
 	/***************************************************************************
 		UI Methods:
 	***************************************************************************/
 
-	public static function navbar()
+	public function navbar()
 	{
-		if ( ! \Admin::enable()) {
+		if ( ! $this->devhook->backendAllowed()) {
 			return;
-		}
-
-		$models = \Devhook::scanModels();
-		foreach ($models as $model => $path) {
-			$model::initAdminUi();
 		}
 
 		return View::make('admin.ui.navbar');
@@ -62,18 +91,18 @@ class AdminUI
 
 	//--------------------------------------------------------------------------
 
-	public static function alerts()
+	public function alerts()
 	{
 		return View::make('admin.ui.alerts');
 	}
 
 	//--------------------------------------------------------------------------
 
-	public static function actions($actions, $sizeClass='btn-xs') {
+	public function actions($actions, $sizeClass='btn-xs') {
 		$result = '';
 		$html = app('html');
 		foreach ($actions as $key => $act) {
-			$url      = isset($act['link']) ? Admin::url($act['link']) : '#';
+			$url      = isset($act['link']) ? URL::to($this->devhook->backendRoute($act['link'])) : '#';
 			$icon     = empty($act['icon']) ? '' : '<i class="icon-'.$act['icon'].'"></i>';
 			$title    = isset($act['title']) ? ($icon ? ' ' : '') . $act['title'] : '';
 			$btnClass = $sizeClass . ' btn btn-' . (empty($act['class']) ? 'default' : $act['class']);
@@ -87,7 +116,7 @@ class AdminUI
 
 	//--------------------------------------------------------------------------
 
-	public static function breadcrumbs($breadcrumbs = null, $custom_data = null)
+	public function breadcrumbs($breadcrumbs = null, $custom_data = null)
 	{
 		static $data = array();
 
@@ -111,19 +140,21 @@ class AdminUI
 
 	//--------------------------------------------------------------------------
 
-	public static function menu($key, $subKey = null)
+	public function menu($key, $subKey = null)
 	{
+		// return $this->menu->get($key);
+
 		static $menus = array();
 
 		if (empty($menus[$key])) {
 			$menus[$key] = new \iMenu();
-			$menus[$key]->linkPrefix(Admin::adminRoute());
+			$menus[$key]->linkPrefix($this->devhook->backendRoute());
 			$menus[$key]->elem()->className('dh-' . $key);
 		}
 
 		if ($subKey !== null) {
 			$submenu = $menus[$key]->submenu($subKey);
-			$submenu->linkPrefix(Admin::adminRoute());
+			$submenu->linkPrefix($this->devhook->backendRoute());
 			return $submenu;
 			// if (empty($menus[$key]->submenu)) {
 			// 	$menus[$key]->submenu = new \iMenu();
@@ -140,10 +171,10 @@ class AdminUI
 		Common widgets
 	***************************************************************************/
 
-	public static function dataTable($model, $data = null)
+	public function dataTable($model, $data = null)
 	{
-		static $defaultColumnFilter = array('id', 'image', 'title', 'name', 'login', 'email', 'price', 'created_at');
-		static $defaultData = array(
+		static $defaultColumnsByName = array('id', 'image', 'name', 'title', 'login', 'email', 'price', 'created_at');
+		static $defaultData    = array(
 			'columns'  => true,
 			'paginate' => true,
 			// 'sorting'     => true,
@@ -159,15 +190,36 @@ class AdminUI
 			$model = new $model;
 		}
 
+		$fields = $model->getFields();
+
+		$defaultColumns = array();
+		foreach ($defaultColumnsByName as $name) {
+			if (isset($fields[$name])) {
+				$defaultColumns[$name] = null;
+			}
+		}
+
+
 		// Data
 		if ( ! $data['data']) {
 			$fn = isset($data['query']) ? $data['query'] : function($query){
 				$query->orderBy('id', 'DESC');
 			};
+
+			$model->setRelation('images', function($model){
+				return $model->morphMany('Image', 'imageable')->orderBy('primary', 'desc');
+			});
+
 			$query = $model->newQuery();
 			$fn($query);
 
-			$query->with('images');
+			// foreach ($fields as $field) {
+			// 	if (is_object($field)) {
+			// 		$field->adminQueryBulder($model);
+			// 	}
+			// }
+
+			// $query->with('images');
 
 			if ($data['paginate']) {
 				$limit = $data['paginate'] === true ? 30 : $data['paginate'];
@@ -178,19 +230,11 @@ class AdminUI
 		}
 
 		// Columns
-		$columnFilter    = is_array($data['columns']) ? $data['columns'] : $defaultColumnFilter;
-		$fields          = $model->fields();
+		$columns         = is_array($data['columns']) ? $data['columns'] : $defaultColumns;
 		$data['columns'] = array();
-		foreach ($columnFilter as $key => $mutator) {
-			if (is_numeric($key)) {
-				$key     = $mutator;
-				$mutator = null;
-			}
 
+		foreach ($columns as $key => $mutator) {
 			if (isset($fields[$key])) {
-				// if (!$mutator) {
-				// 	$mutator = $fields[$key]->valueMutator($model, $key);
-				// }
 				$data['columns'][$key] = $fields[$key];
 				$data['columns'][$key]->mutator = $mutator ? $mutator : false;
 			}
@@ -198,7 +242,6 @@ class AdminUI
 
 		// Pagination
 		if ($data['paginate']) {
-			// ->appends(array('sort'=>$sort, 'desc'=>$desc))
 			$data['pagination'] = $data['data']->links();
 		}
 

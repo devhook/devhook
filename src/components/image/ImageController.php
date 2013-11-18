@@ -72,7 +72,7 @@ class ImageController extends \Controller
 
 		// $fileExt = pathinfo($model->$field, PATHINFO_EXTENSION);
 
-		$fields     = (array) $model->fields();
+		$fields     = (array) $model->getFields();
 		$modelField = isset($fields[$field]) ? $fields[$field] : false;
 
 		if (!$modelField || empty($modelField->type)) {

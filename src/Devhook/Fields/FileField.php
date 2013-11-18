@@ -32,7 +32,7 @@ class FileField extends BaseField {
 				if ($value) {
 					$view->with('filename',     pathinfo($value, PATHINFO_BASENAME));
 					$view->with('filesize',     File::size(public_path($value)));
-					$view->with('removeAction', \Admin::url('action/delete', $this->model->modelFullKeyword(), $this->model->id, $this->name));
+					$view->with('removeAction', URL::to(Devhook::backendRoute('action/delete', $this->model->getModelFullKeyword(), $this->model->id, $this->name)));
 				}
 
 				return $view;
@@ -56,7 +56,11 @@ class FileField extends BaseField {
 		if ($newfile = $this->saveFile($data[$name])) {
 			$model->$name = $newfile;
 
-			$model->event('saved', array($this, 'afterSave'));
+			$modelClass = get_class($this->model);
+			$field      = $this;
+			$modelClass::saved(function() use ($field) {
+				$field->afterSave();
+			});
 
 			// Удаляем старый файл
 			if ($oldfile && $oldfile != $newfile) {
@@ -72,7 +76,7 @@ class FileField extends BaseField {
 		$model = $this->model;
 		$name  = $this->name;
 		$path  = $this->settings('path', function() use ($model, $name) {
-			return Config::get('devhook.publicFilesPath') . '/' . $model->modelKeyword() . '/' . $name;
+			return Config::get('devhook.publicFilesPath') . '/' . $model->getModelKeyword() . '/' . $name;
 		});
 
 
@@ -152,7 +156,7 @@ class FileField extends BaseField {
 
 	//--------------------------------------------------------------------------
 
-	protected function setRules($rules)
+	protected function rulesMutator($rules)
 	{
 		if ($rules && is_string($rules)) {
 			$rules = explode('|', $rules);

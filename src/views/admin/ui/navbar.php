@@ -6,10 +6,10 @@
 })(jQuery);
 </script>
 
+<? print_r($app->adminUI->menu->get('navbar')); exit; ?>
 <div id="devhook-navbar" class="devhook-navbar">
-	<?=AdminUI::menu('modes') ?>
-	<?=AdminUI::menu('navbar') ?>
-	<?=AdminUI::menu('tray') ?>
+	<?=$app->adminUI->menu->get('navbar') ?>
+	<?=$app->adminUI->menu->get('tray') ?>
 </div>
 
 <script>

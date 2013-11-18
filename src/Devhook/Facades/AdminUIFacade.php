@@ -2,7 +2,7 @@
 
 use \Illuminate\Support\Facades\Facade;
 
-class AdminFacade extends Facade
+class AdminUIFacade extends Facade
 {
 
     /**
@@ -12,7 +12,7 @@ class AdminFacade extends Facade
      */
     protected static function getFacadeAccessor()
     {
-    	return 'admin';
+    	return 'adminUI';
     }
 
 }

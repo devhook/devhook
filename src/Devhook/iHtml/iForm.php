@@ -276,7 +276,7 @@ class iForm {
 		$this->model  = $model;
 		$this->data   = $model->getAttributes();
 		$this->errors = Session::get('errors');
-		$allFields    = $model->fields();
+		$allFields    = $model->getFields();
 
 		static::$objectMacros[] = $this;
 
@@ -408,7 +408,7 @@ class iForm {
 
 	//--------------------------------------------------------------------------
 
-	public function fields()
+	public function getFields()
 	{
 		return (array) $this->fields;
 	}
@@ -499,7 +499,7 @@ class iForm {
 
 	public function fieldRequired($field)
 	{
-		return $this->fields[$field]->required($this->rulesKey);
+		return $this->fields[$field]->isRequired($this->rulesKey);
 	}
 
 	//--------------------------------------------------------------------------

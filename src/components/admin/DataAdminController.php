@@ -41,7 +41,7 @@ class DataAdminController extends AdminController
 	public function postAdd()
 	{
 		if ($this->model->save()) {
-			return \Admin::redirect($this->link);
+			return Redirect::to(Devhook::backendRoute($this->link));
 		}
 
 		return Redirect::back()
@@ -69,7 +69,7 @@ class DataAdminController extends AdminController
 
 		if ($data->save()) {
 			if (Input::get('redirect_back')) {
-				return \Admin::redirect($this->link);
+				return Redirect::to(Devhook::backendRoute($this->link));
 			} else {
 				return Redirect::back();
 			}
@@ -104,12 +104,11 @@ class DataAdminController extends AdminController
 		$methodAction = strtolower($_SERVER['REQUEST_METHOD']) . $action;
 		$anyAction    = 'any' . $action;
 		$args         = array_splice($args, 2);
-		$modelActions = $modelClass::modelActions();
+		$modelActions = $this->model->getModelActions();
 		$this->link   = $modelActions['list']['link'];
 		\AdminUI::menu('navbar')->active('data');
 
-		$actions = $modelClass::modelActions();
-		foreach ($actions as $key => $act) {
+		foreach ($modelActions as $key => $act) {
 			$menuItem = \AdminUI::menu('actions')->add($act['link'], $act['title']);
 			if (!empty($act['icon'])) {
 				$menuItem->icon($act['icon']);

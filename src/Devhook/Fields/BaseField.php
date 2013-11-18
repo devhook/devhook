@@ -51,18 +51,50 @@ class BaseField {
 
 	//--------------------------------------------------------------------------
 
-	public function rules($key)
+	public function getRules()
 	{
-		return $this->setRules($this->get($key));
+		$allRules    = $this->get('rules');
+		$eventRules  = $this->get($this->model->exists ? 'edit_rules' : 'add_rules');
+
+		if ($allRules && $eventRules) {
+
+			if (is_string($allRules) && is_string($eventRules)) {
+				$rules = $allRules . '|' . $eventRules;
+			} else {
+				if (is_string($eventRules)) $eventRules = explode('|', $eventRules);
+				if (is_string($allRules)) $allRules = explode('|', $allRules);
+				$rules = array_merge((array)$allRules, (array)$eventRules);
+			}
+		} elseif($allRules) {
+			$rules = $allRules;
+		} else {
+			$rules = $eventRules;
+		}
+
+		return $this->rulesMutator($rules);
+	}
+
+	//-------------------------------------------------------------------------
+
+	public function getLabel()
+	{
+		return $this->label;
+	}
+
+	//-------------------------------------------------------------------------
+
+	public function getType()
+	{
+		return $this->type;
 	}
 
 	//--------------------------------------------------------------------------
 
-	public function required($rulesKey = 'rules')
+	public function isRequired()
 	{
-		if ($rules = $this->get($rulesKey)) {
+		if ($rules = $this->getRules()) {
 			if (is_array($rules)) {
-				return current($rules) == 'required';
+				return in_array('required', $rules);
 			}
 
 			return strpos($rules, 'required') !== false;
@@ -104,7 +136,7 @@ class BaseField {
 
 	//--------------------------------------------------------------------------
 
-	protected function setRules($rules)
+	protected function rulesMutator($rules)
 	{
 		return $rules;
 	}
@@ -134,6 +166,12 @@ class BaseField {
 	public function adminValueMutator($row, $key)
 	{
 		return $row->$key;
+	}
+
+	//-------------------------------------------------------------------------
+
+	public function adminQueryBulder($query) {
+
 	}
 
 	//--------------------------------------------------------------------------

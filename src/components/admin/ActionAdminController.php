@@ -38,7 +38,7 @@ class ActionAdminController extends \AdminController {
 
 		if ($user->validate('loginRules')) {
 			if (User::auth()) {
-				return \Admin::redirect('/');
+				return \Redirect::to(\Devhook::backendRoute());
 			}
 
 			$user->validator()->messages()->add('', 'Не верный логин или пароль');
@@ -62,7 +62,7 @@ class ActionAdminController extends \AdminController {
 	{
 		switch ($mode) {
 			case 'admin':
-				return Redirect::to(\Admin::url());
+				return Redirect::to(\Devhook::backendRoute());
 				break;
 
 			// case 'edit':
